@@ -56,7 +56,7 @@ div.cv {background:#505050 url(img/front-cv.jpg) bottom left repeat-y;}
 #publ a {border-color:#fff; color:#0101DF; text-decoration:none;}
 
 /* Sidebar */
-#sidebar {float:right; width:150px;}
+#sidebar {float:right; width:160px;}
 #sidebar p {font-size:0.9em; line-height:1.3em; margin:0 0 15px;}
 #sidebar ul {margin:0 0 15px 0; padding:0;}
 #sidebar li {list-style:none;}
