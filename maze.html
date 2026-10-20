@@ -1,0 +1,1524 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Maze Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Grandstander:wght@600;800;900&display=swap">
+<style>
+/* ---------- colour tokens ---------- */
+:root{
+  --bg:#d7ebff;--card:#ffffff;--card-edge:#b2cdee;--card-2:#eaf3ff;
+  --ink:#1d2a55;--ink-soft:#55628c;
+  --paper:#ffffff;--paper-dot:#cfdcf0;
+  --wall:#243163;--ring:#243163;--num-bg:#ffffff;--halo:#ffffff;
+  --btn:#ff9a3d;--btn-edge:#d4711a;--btn-ink:#1d2a55;
+  --ghost:#ffffff;--ghost-edge:#b2cdee;
+  --good:#138a4a;--bad:#c42d3c;--hint:#875800;
+  --rb-off:#e1e9f5;--cloud:#ffffff;--cloud-edge:#c4d3ea;
+  --focus:#1f6fe0;--scrim:rgba(12,22,50,.5);--outline:#2f2a3a;
+  --display:"Grandstander",ui-rounded,"Arial Rounded MT Bold",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --text:"Andika","Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --emoji:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0d1430;--card:#18224a;--card-edge:#070c22;--card-2:#222e61;
+    --ink:#eef2ff;--ink-soft:#a9b4db;
+    --paper:#16204d;--paper-dot:#2a366e;
+    --wall:#e6ecff;--ring:#e6ecff;--num-bg:#16204d;--halo:#16204d;
+    --btn:#ff9a3d;--btn-edge:#b25d12;--btn-ink:#1d2a55;
+    --ghost:#222e61;--ghost-edge:#070c22;
+    --good:#6ee0a2;--bad:#ff8c97;--hint:#ffd56b;
+    --rb-off:#2a3567;--cloud:#e8eeff;--cloud-edge:#7d89b8;
+    --focus:#7fbfff;--scrim:rgba(0,0,0,.62);--outline:#2f2a3a;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0d1430;--card:#18224a;--card-edge:#070c22;--card-2:#222e61;
+  --ink:#eef2ff;--ink-soft:#a9b4db;
+  --paper:#16204d;--paper-dot:#2a366e;
+  --wall:#e6ecff;--ring:#e6ecff;--num-bg:#16204d;--halo:#16204d;
+  --btn:#ff9a3d;--btn-edge:#b25d12;--btn-ink:#1d2a55;
+  --ghost:#222e61;--ghost-edge:#070c22;
+  --good:#6ee0a2;--bad:#ff8c97;--hint:#ffd56b;
+  --rb-off:#2a3567;--cloud:#e8eeff;--cloud-edge:#7d89b8;
+  --focus:#7fbfff;--scrim:rgba(0,0,0,.62);--outline:#2f2a3a;
+  color-scheme:dark;
+}
+
+/* ---------- base ---------- */
+*,*::before,*::after{box-sizing:border-box}
+html{height:100%;background:var(--bg);scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%;text-size-adjust:100%}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:var(--text);font-size:17px;line-height:1.4;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+[hidden]{display:none!important}
+h1,h2,h3{font-family:var(--display);line-height:1.05;margin:0}
+#app{height:100%}
+.screen{display:none;height:100%;flex-direction:column}
+.screen.active{display:flex}
+.scroll{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.dotpaper{background:radial-gradient(circle,var(--paper-dot) 1.3px,transparent 1.8px) 0 0/16px 16px,var(--paper)}
+
+/* ---------- buttons ---------- */
+.icon-btn{flex:none;width:44px;height:44px;display:grid;place-items:center;border:0;border-radius:14px;background:var(--ghost);color:var(--ink);box-shadow:0 4px 0 var(--ghost-edge);font-size:20px;line-height:1;cursor:pointer;transition:transform .08s,box-shadow .08s}
+.icon-btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ghost-edge)}
+.icon-btn svg{width:22px;height:22px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:18px;padding:14px 18px;font-family:var(--display);font-weight:800;font-size:1.2rem;line-height:1.1;cursor:pointer;transition:transform .08s,box-shadow .08s}
+.btn-main{background:var(--btn);color:var(--btn-ink);box-shadow:0 5px 0 var(--btn-edge)}
+.btn-ghost{background:var(--ghost);color:var(--ink);box-shadow:0 5px 0 var(--ghost-edge)}
+.btn-main:active{transform:translateY(4px);box-shadow:0 1px 0 var(--btn-edge)}
+.btn-ghost:active{transform:translateY(4px);box-shadow:0 1px 0 var(--ghost-edge)}
+.card .btn-ghost{background:var(--card-2)}
+
+/* ---------- home ---------- */
+.home{width:100%;max-width:1000px;margin:0 auto;padding:20px 16px 32px}
+.home-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.title{font-weight:900;font-size:clamp(46px,13vw,76px);letter-spacing:-.015em}
+.tagline{margin:8px 0 0;color:var(--ink-soft);font-size:1.06rem;max-width:38ch}
+.hero{margin-top:18px;border-radius:22px;padding:8px;box-shadow:0 5px 0 var(--card-edge)}
+.hero svg{display:block;width:100%;height:auto;max-height:220px}
+.hero .walls{fill:none;stroke:var(--wall);stroke-width:6;stroke-linecap:round;stroke-linejoin:round}
+.hero .crayon{fill:none;stroke:#ff8a2a;stroke-width:13;stroke-linecap:round;stroke-linejoin:round;opacity:.6;stroke-dasharray:1;stroke-dashoffset:1;animation:draw 2.8s ease-in-out .5s forwards}
+.sec{margin-top:28px}
+.sec h2{margin:0 4px 12px;font-size:1.5rem;font-weight:800}
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (min-width:620px){.cards{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (min-width:900px){.cards{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.gcard{position:relative;display:flex;flex-direction:column;gap:7px;width:100%;border:0;border-radius:20px;padding:10px 10px 14px;background:var(--card);box-shadow:0 5px 0 var(--card-edge);text-align:left;cursor:pointer;transition:transform .08s,box-shadow .08s}
+.gcard:active{transform:translateY(3px);box-shadow:0 2px 0 var(--card-edge)}
+.tile{height:88px;border-radius:14px;display:flex;align-items:center;justify-content:center;gap:6px;overflow:hidden}
+.temo{font-family:var(--emoji);font-size:36px;line-height:1}
+.tdots{width:40px;height:16px}
+.tdots path,.duo path{fill:none;stroke:#ff8a2a;stroke-width:3.5;stroke-linecap:round;stroke-dasharray:.5 7}
+.tnum{width:36px;height:36px;border-radius:50%;border:3px solid var(--ring);background:var(--num-bg);display:grid;place-items:center;font-weight:700;font-size:18px;color:var(--ink)}
+.tnum.let{border-color:#9b6bff}
+.tile .rb{width:104px}
+.thead{height:78px;width:auto}
+.tkey{width:44px;height:44px}
+.gname{padding:0 2px;font-family:var(--display);font-weight:800;font-size:1.18rem;line-height:1.1}
+.gdesc{padding:0 2px;font-size:.93rem;line-height:1.25;color:var(--ink-soft)}
+.tick{position:absolute;top:4px;right:4px;width:30px;height:30px;border-radius:50%;background:var(--good);color:var(--paper);display:grid;place-items:center;font-weight:700;font-size:17px;box-shadow:0 2px 0 rgba(0,0,0,.2)}
+.foot{margin:28px 4px 0;text-align:center;color:var(--ink-soft);font-size:.93rem}
+
+/* ---------- play ---------- */
+.topbar{flex:none;display:flex;align-items:center;gap:8px;width:100%;max-width:1200px;margin:0 auto;padding:8px 12px 2px}
+.bar-title{flex:1;min-width:0;font-family:var(--display);font-weight:800;font-size:1.3rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.new-btn{flex:none;height:44px;display:inline-flex;align-items:center;gap:6px;padding:0 14px;border:0;border-radius:14px;background:var(--ghost);color:var(--ink);box-shadow:0 4px 0 var(--ghost-edge);font-family:var(--display);font-weight:800;font-size:1.02rem;cursor:pointer;transition:transform .08s,box-shadow .08s}
+.new-btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ghost-edge)}
+.new-btn svg{width:20px;height:20px}
+@media (max-width:430px){.new-btn{width:44px;padding:0;justify-content:center}.new-btn span{display:none}}
+.play-body{flex:1 1 auto;min-height:0;width:100%;max-width:1200px;margin:0 auto;padding:6px 12px 12px;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto;grid-template-areas:"hud" "board" "pad";gap:10px}
+.hud{grid-area:hud;display:flex;align-items:center;gap:12px;min-height:104px;padding:8px 10px 8px 12px;border-radius:20px;background:var(--card);box-shadow:0 4px 0 var(--card-edge)}
+.hud-vis{flex:none;display:grid;place-items:center;min-width:60px;max-width:104px;height:96px}
+.hud-main{flex:1;min-width:0}
+.hud-goal{font-family:var(--display);font-weight:800;font-size:1.16rem;line-height:1.1}
+.hud-msg{margin-top:5px;min-height:2.5em;font-weight:700;font-size:.93rem;line-height:1.25;color:var(--ink-soft)}
+.hud-msg.good{color:var(--good)}
+.hud-msg.bad{color:var(--bad)}
+.hud-msg.hint{color:var(--hint)}
+.hud-tools{flex:none;display:flex;flex-direction:column;gap:8px}
+.tool{width:42px;height:42px;display:grid;place-items:center;border:0;border-radius:13px;background:var(--card-2);font-family:var(--emoji);font-size:19px;cursor:pointer}
+.board-wrap{grid-area:board;min-width:0;min-height:0;display:grid;place-items:center}
+#board{display:block;width:100%;height:100%;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;cursor:pointer}
+.pad{grid-area:pad;display:grid;grid-template-columns:repeat(3,64px);grid-template-rows:repeat(2,50px);grid-template-areas:". u ." "l d r";gap:6px;justify-content:center}
+.pad button{display:grid;place-items:center;border:0;border-radius:14px;background:var(--ghost);color:var(--ink);box-shadow:0 4px 0 var(--ghost-edge);cursor:pointer}
+.pad button:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ghost-edge)}
+.pad svg{width:26px;height:26px}
+
+/* the side panel visuals */
+.vis-full{display:none}
+.kid{display:block;height:96px;width:auto}
+.big-num{width:66px;height:66px;border-radius:50%;border:4px solid var(--ring);background:var(--num-bg);display:grid;place-items:center;font-weight:700;font-size:31px;color:var(--ink)}
+.ngrid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}
+.ng{width:38px;height:38px;border-radius:50%;border:2.5px solid var(--ring);background:var(--num-bg);display:grid;place-items:center;font-weight:700;font-size:16px}
+.ng.got{background:var(--good);border-color:var(--good);color:var(--paper)}
+.ng.next{box-shadow:0 0 0 4px var(--btn)}
+.rb{display:block;width:98px;height:auto}
+.rb-off{stroke:var(--rb-off)}
+.cloud{fill:var(--cloud);stroke:var(--cloud-edge);stroke-width:1.2}
+.duo{display:flex;align-items:center;gap:2px;font-family:var(--emoji);font-size:28px;line-height:1}
+.duo svg{width:30px;height:14px}
+.krow{display:flex;align-items:center;gap:3px}
+.kslot{width:25px;height:25px;display:block}
+.kslot svg{width:100%;height:100%;display:block}
+.kslot:not(.have) svg{filter:grayscale(1);opacity:.3}
+.kslot.used svg{opacity:.45}
+.kgem{font-family:var(--emoji);font-size:22px;margin-left:1px}
+.avis{display:flex;align-items:center;gap:6px}
+.agrid{display:grid;grid-template-columns:repeat(2,30px);gap:2px}
+.acell{position:relative;display:grid;place-items:center;width:30px;height:30px;font-family:var(--emoji);font-size:23px;line-height:1}
+.acell i{position:absolute;right:-3px;top:-3px;font-style:normal;font-size:14px}
+.carry{width:38px;height:38px;border-radius:50%;border:3px dashed var(--ink-soft);display:grid;place-items:center;font-family:var(--emoji);font-size:21px}
+.carry.full{border-style:solid;border-color:var(--btn);background:var(--card-2)}
+.spell{display:flex;flex-direction:column;align-items:center;gap:6px}
+.pic{font-family:var(--emoji);font-size:40px;line-height:1}
+.slots{display:flex;gap:2px}
+.sl{width:18px;padding-bottom:1px;border-bottom:3px solid var(--ink);text-align:center;font-weight:700;font-size:17px;line-height:1.1;color:var(--ink-soft);opacity:.4}
+.sl.got{opacity:1;color:var(--ink)}
+
+/* tablets held upright: bigger pictures in the panel */
+@media (orientation:portrait) and (min-width:700px){
+  .hud{min-height:160px;gap:18px;padding:12px 16px}
+  .hud-vis{height:150px;max-width:none}
+  .hud-goal{font-size:1.6rem}
+  .hud-msg{font-size:1.12rem}
+  .tool{width:52px;height:52px;font-size:24px}
+  .kid{height:150px}
+  .vis-compact{display:none}
+  .vis-full{display:block}
+  .ngrid{grid-template-columns:repeat(10,1fr);gap:6px}
+  .rb{width:180px}
+  .duo{font-size:46px;gap:6px}
+  .duo svg{width:56px;height:20px}
+  .kslot{width:44px;height:44px}
+  .kgem{font-size:36px}
+  .agrid{grid-template-columns:repeat(2,48px);gap:6px}
+  .acell{width:48px;height:48px;font-size:36px}
+  .acell i{font-size:17px}
+  .carry{width:58px;height:58px;font-size:32px}
+  .pic{font-size:60px}
+  .sl{width:30px;font-size:26px}
+  .pad{grid-template-columns:repeat(3,84px);grid-template-rows:repeat(2,64px)}
+}
+@media (orientation:landscape) and (min-width:640px){
+  .play-body{grid-template-columns:minmax(220px,300px) minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto;grid-template-areas:"hud board" "pad board"}
+  .hud{flex-direction:column;align-items:stretch;justify-content:center;gap:14px;padding:16px 14px;text-align:center;overflow-y:auto}
+  .hud-main{flex:none}
+  .hud-goal{font-size:1.4rem}
+  .hud-msg{font-size:1rem;min-height:3.75em}
+  .hud-vis{height:auto;max-width:none;min-height:110px}
+  .hud-tools{flex-direction:row;justify-content:center}
+  .vis-compact{display:none}
+  .vis-full{display:block}
+  .kid{height:min(300px,46vh)}
+  .rb{width:210px}
+  .duo{font-size:46px;gap:6px}
+  .duo svg{width:60px;height:22px}
+  .kslot{width:46px;height:46px}
+  .kgem{font-size:38px}
+  .agrid{grid-template-columns:repeat(2,52px);gap:8px}
+  .acell{width:52px;height:52px;font-size:38px}
+  .acell i{font-size:18px}
+  .carry{width:60px;height:60px;font-size:32px}
+  .avis{flex-direction:column}
+  .pic{font-size:64px}
+  .sl{width:30px;font-size:26px}
+}
+
+/* ---------- maze board ---------- */
+#board .paper{fill:var(--paper)}
+.pdot{fill:var(--paper-dot)}
+#board .walls{fill:none;stroke:var(--wall);stroke-width:6;stroke-linecap:round;stroke-linejoin:round}
+#board .trail{fill:none;stroke-width:13;stroke-linecap:round;stroke-linejoin:round;opacity:.5}
+#board.no-trail .trail{display:none}
+.emo{font-family:var(--emoji);text-anchor:middle}
+.nb{fill:var(--num-bg);stroke:var(--ring);stroke-width:2.5}
+.nt{font-family:var(--text);font-weight:700;font-size:17px;text-anchor:middle;fill:var(--ink)}
+.lb{fill:var(--num-bg);stroke:#9b6bff;stroke-width:3}
+.lt{font-family:var(--text);font-weight:700;font-size:20px;text-anchor:middle;fill:var(--ink)}
+.o{stroke:var(--outline);stroke-width:3;stroke-linejoin:round;stroke-linecap:round}
+.it .o{stroke-width:6}
+.o2{stroke:var(--outline);stroke-width:1.8;stroke-linejoin:round}
+.keyhole{fill:var(--paper)}
+.door-r{stroke:var(--wall);stroke-width:2.5}
+.halo{fill:var(--halo);stroke:var(--wall);stroke-width:2;stroke-opacity:.3}
+.carry-bg{fill:var(--paper);stroke:var(--btn);stroke-width:2.5}
+.pl{transition:transform 85ms linear}
+.it,.pl-in,.dr,.gm{transform-box:fill-box;transform-origin:center}
+.it.out,.dr.out{animation:out .42s ease-in forwards}
+.it.nope,.dr.nope{animation:nope .45s}
+.it.wig{animation:wig .55s}
+.pl-in.ping{animation:ping .6s}
+.pl-in.bump-u{animation:bumpU .2s}
+.pl-in.bump-d{animation:bumpD .2s}
+.pl-in.bump-l{animation:bumpL .2s}
+.pl-in.bump-r{animation:bumpR .2s}
+.goal-glow{fill:#ffd23f;opacity:.45;transform-box:fill-box;transform-origin:center;animation:breathe 1.8s ease-in-out infinite}
+.hint-ring{fill:none;stroke:#ffb400;stroke-width:4.5;transform-box:fill-box;transform-origin:center;animation:ring 1s ease-out 3 both}
+.hint-dot{fill:#ffb400;animation:dot 3.2s ease both}
+.gm.new{animation:dressIn .55s cubic-bezier(.2,1.4,.4,1)}
+
+/* ---------- overlays ---------- */
+.overlay{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:calc(16px + env(safe-area-inset-top,0px)) 16px calc(16px + env(safe-area-inset-bottom,0px));background:var(--scrim);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+.card{width:100%;max-width:420px;max-height:100%;overflow:auto;border-radius:28px;padding:22px 20px 20px;background:var(--card);text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.3);animation:rise .38s cubic-bezier(.2,1.3,.4,1)}
+.card h2{margin:10px 0 4px;font-size:2rem;font-weight:900}
+.win-text{margin:0 0 18px;color:var(--ink-soft);font-size:1.1rem}
+.win-vis{display:grid;place-items:center}
+.win-emo{font-family:var(--emoji);font-size:76px;line-height:1;animation:pop .7s cubic-bezier(.3,1.6,.5,1)}
+.win-vis .kid{height:220px}
+.win-vis .rb{width:240px}
+.win-vis .agrid{grid-template-columns:repeat(4,52px);gap:6px}
+.win-vis .acell{width:52px;height:52px;font-size:40px}
+.win-vis .pic{font-size:72px}
+.win-word{font-family:var(--display);font-weight:900;font-size:2.4rem;letter-spacing:.08em}
+.win-actions{display:grid;gap:14px}
+.sheet{text-align:left}
+.sheet h2{text-align:center;margin:0 0 4px;font-size:1.7rem}
+.set-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:2px solid var(--card-2);font-weight:700}
+.switch{flex:none;position:relative;width:54px;height:32px;border:0;border-radius:99px;background:var(--rb-off);cursor:pointer;transition:background .2s}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .2s}
+.switch[aria-checked="true"]{background:var(--good)}
+.switch[aria-checked="true"]::after{transform:translateX(22px)}
+.seg{flex:none;display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;border-radius:14px;background:var(--card-2)}
+.seg button{min-width:52px;border:0;background:none;padding:7px 8px;border-radius:10px;cursor:pointer;font-weight:700}
+.seg button[aria-pressed="true"]{background:var(--card);box-shadow:0 2px 0 var(--card-edge)}
+.set-note{margin:14px 0;color:var(--ink-soft);font-size:.95rem}
+.set-actions{display:flex;gap:10px}
+.set-actions .btn{flex:1;font-size:1.05rem;padding:12px}
+.confetti{position:fixed;inset:0;z-index:60;pointer-events:none;overflow:hidden}
+.confetti i{position:absolute;left:50%;top:42%;border-radius:3px;background:var(--c);animation:fly 1.5s cubic-bezier(.15,.7,.35,1) both}
+
+/* ---------- motion ---------- */
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes out{to{transform:scale(1.7);opacity:0}}
+@keyframes nope{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(2px)}}
+@keyframes wig{0%,100%{transform:rotate(0)}25%{transform:rotate(-14deg)}75%{transform:rotate(14deg)}}
+@keyframes ping{0%,100%{transform:scale(1)}40%{transform:scale(1.55)}}
+@keyframes bumpU{50%{transform:translateY(-6px)}}
+@keyframes bumpD{50%{transform:translateY(6px)}}
+@keyframes bumpL{50%{transform:translateX(-6px)}}
+@keyframes bumpR{50%{transform:translateX(6px)}}
+@keyframes breathe{0%,100%{transform:scale(.85)}50%{transform:scale(1.15)}}
+@keyframes ring{from{transform:scale(.55);opacity:1}to{transform:scale(1.35);opacity:0}}
+@keyframes dot{0%{opacity:0}12%{opacity:.95}80%{opacity:.95}100%{opacity:0}}
+@keyframes dressIn{from{transform:scale(1.3);opacity:0}to{transform:none;opacity:1}}
+@keyframes rise{from{transform:translateY(30px) scale(.94);opacity:0}to{transform:none;opacity:1}}
+@keyframes pop{from{transform:scale(.4) rotate(-12deg);opacity:0}to{transform:none;opacity:1}}
+@keyframes fly{0%{transform:translate(-50%,-50%) rotate(0);opacity:1}40%{transform:translate(calc(-50% + var(--x) * .7),calc(-50% + var(--y1))) rotate(calc(var(--rot) * .5));opacity:1}100%{transform:translate(calc(-50% + var(--x)),calc(-50% + var(--y2))) rotate(var(--rot));opacity:0}}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- HOME -->
+  <section class="screen active" id="home" aria-label="Choose a maze">
+    <div class="scroll">
+      <div class="home">
+        <header class="home-head">
+          <div>
+            <h1 class="title">Maze Book</h1>
+            <p class="tagline">Draw a path through each maze. Some mazes ask you to collect things in the right order.</p>
+          </div>
+          <button type="button" class="icon-btn" data-settings aria-label="Settings for grown-ups">⚙️</button>
+        </header>
+        <div class="hero dotpaper" aria-hidden="true"><svg id="hero"></svg></div>
+        <div id="sections"></div>
+        <p class="foot">A tick means you’ve finished that maze on this device. Every maze is new each time you play.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLAY -->
+  <section class="screen" id="play" aria-label="Maze">
+    <header class="topbar">
+      <button type="button" class="icon-btn" data-go="home" aria-label="Back to all mazes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="bar-title" id="playTitle"></div>
+      <button type="button" class="new-btn" id="newBtn" aria-label="New maze"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.6-5.9M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>New maze</span></button>
+      <button type="button" class="icon-btn" data-settings aria-label="Settings for grown-ups">⚙️</button>
+    </header>
+    <div class="play-body">
+      <div class="hud">
+        <div class="hud-vis" id="hudVis" aria-hidden="true"></div>
+        <div class="hud-main">
+          <div class="hud-goal" id="hudGoal"></div>
+          <div class="hud-msg" id="hudMsg" role="status" aria-live="polite"></div>
+        </div>
+        <div class="hud-tools">
+          <button type="button" class="tool" id="sayBtn" aria-label="Read it to me">🔊</button>
+          <button type="button" class="tool" id="hintBtn" aria-label="Show me a hint">💡</button>
+        </div>
+      </div>
+      <div class="board-wrap" id="boardWrap"><svg id="board" role="img" aria-label="Maze"></svg></div>
+      <div class="pad" id="pad" hidden>
+        <button type="button" data-dir="u" style="grid-area:u" aria-label="Up"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 15l7-7 7 7" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button type="button" data-dir="l" style="grid-area:l" aria-label="Left"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button type="button" data-dir="d" style="grid-area:d" aria-label="Down"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 9l7 7 7-7" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button type="button" data-dir="r" style="grid-area:r" aria-label="Right"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- FINISHED -->
+<div class="overlay" id="win" hidden>
+  <div class="card" role="dialog" aria-modal="true" aria-labelledby="winTitle">
+    <div class="win-vis" id="winVis" aria-hidden="true"></div>
+    <h2 id="winTitle"></h2>
+    <p class="win-text" id="winText"></p>
+    <div class="win-actions">
+      <button type="button" class="btn btn-main" id="winMain">New maze</button>
+      <button type="button" class="btn btn-ghost" data-go="home">All mazes</button>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div class="overlay" id="settings" hidden>
+  <div class="card sheet" role="dialog" aria-modal="true" aria-labelledby="setTitle">
+    <h2 id="setTitle">For grown-ups</h2>
+    <div class="set-row"><span>Sound effects</span><button type="button" class="switch" role="switch" data-key="sound" aria-label="Sound effects"></button></div>
+    <div class="set-row" id="voiceRow"><span>Read instructions aloud</span><button type="button" class="switch" role="switch" data-key="voice" aria-label="Read instructions aloud"></button></div>
+    <div class="set-row"><span>Arrow buttons under the maze</span><button type="button" class="switch" role="switch" data-key="pad" aria-label="Arrow buttons under the maze"></button></div>
+    <div class="set-row"><span>Crayon line behind the player</span><button type="button" class="switch" role="switch" data-key="trail" aria-label="Crayon line behind the player"></button></div>
+    <div class="set-row"><span>Number mazes go up to</span><div class="seg"><button type="button" data-upto="10">10</button><button type="button" data-upto="20">20</button></div></div>
+    <p class="set-note">Children can drag the character with a finger, use the arrow keys, or turn on the arrow buttons. The 💡 button shows what to do next. In the dressing mazes, clothes only go on in an order that makes sense: underwear first, the T-shirt before the sweater, the sweater before the jacket and hat, socks or tights before shoes.</p>
+    <div class="set-actions">
+      <button type="button" class="btn btn-ghost" id="resetBtn">Clear ticks</button>
+      <button type="button" class="btn btn-main" id="closeSettings">Done</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  const $ = (s, r) => (r || document).querySelector(s);
+  const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+  const NS = 'http://www.w3.org/2000/svg';
+  const rand = n => Math.floor(Math.random() * n);
+  const pick = a => a[rand(a.length)];
+  const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = rand(i + 1); const t = a[i]; a[i] = a[j]; a[j] = t; } return a; };
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+  const L = (en, it) => (def && def.lang === 'it' ? it : en);
+
+  /* ---------- settings and ticks stay on this device ---------- */
+  const store = {
+    get(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v && typeof v === 'object' ? v : d; } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* no storage: the game still works */ } }
+  };
+  const settings = Object.assign({ sound: true, voice: false, pad: false, trail: true, upTo: 20 }, store.get('mz.settings', {}));
+  if (settings.upTo !== 10) settings.upTo = 20;
+  let done = store.get('mz.done', {});
+  const saveSettings = () => store.set('mz.settings', settings);
+
+  /* ---------- sound effects, made in the browser ---------- */
+  let actx = null, master = null;
+  function audio() {
+    if (!settings.sound) return null;
+    try {
+      if (!actx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return null;
+        actx = new AC();
+        master = actx.createGain();
+        master.gain.value = 0.5;
+        master.connect(actx.destination);
+      }
+      if (actx.state === 'suspended') actx.resume();
+      return actx;
+    } catch (e) { return null; }
+  }
+  function tone(freq, at, dur, type, vol) {
+    const c = audio();
+    if (!c) return;
+    try {
+      const t = c.currentTime + (at || 0);
+      const o = c.createOscillator(), g = c.createGain();
+      o.type = type || 'sine';
+      o.frequency.setValueAtTime(freq, t);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(vol || 0.2, t + 0.012);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(g);
+      g.connect(master);
+      o.start(t);
+      o.stop(t + dur + 0.03);
+    } catch (e) { /* ignore audio hiccups */ }
+  }
+  const sfx = {
+    pick() { [660, 880, 1175].forEach((f, i) => tone(f, i * 0.06, 0.16, 'triangle', 0.16)); },
+    nope() { tone(320, 0, 0.14, 'triangle', 0.16); tone(240, 0.12, 0.2, 'triangle', 0.16); },
+    bump() { tone(150, 0, 0.08, 'sine', 0.18); },
+    door() { tone(520, 0, 0.08, 'square', 0.05); tone(780, 0.09, 0.2, 'triangle', 0.17); },
+    win() { [523.25, 659.25, 783.99, 1046.5, 1318.5].forEach((f, i) => tone(f, i * 0.1, i === 4 ? 0.55 : 0.24, 'triangle', 0.18)); },
+    tap() { tone(900, 0, 0.05, 'sine', 0.08); }
+  };
+
+  /* ---------- reading aloud ---------- */
+  const canSpeak = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+  let voices = [];
+  function loadVoice() { try { voices = window.speechSynthesis.getVoices() || []; } catch (e) { voices = []; } }
+  function voiceFor(lang) {
+    if (lang === 'it') return voices.find(v => /^it/i.test(v.lang)) || null;
+    return voices.find(v => /^en[-_]GB/i.test(v.lang)) || voices.find(v => /^en/i.test(v.lang)) || null;
+  }
+  if (canSpeak) {
+    loadVoice();
+    try { window.speechSynthesis.addEventListener('voiceschanged', loadVoice); } catch (e) { /* older browsers */ }
+  }
+  function say(text, lang) {
+    if (!canSpeak || !text) return;
+    try {
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      const voice = voiceFor(lang);
+      if (voice) { u.voice = voice; u.lang = voice.lang; } else u.lang = lang === 'it' ? 'it-IT' : 'en-GB';
+      u.rate = 0.92;
+      u.pitch = 1.05;
+      window.speechSynthesis.speak(u);
+    } catch (e) { /* speech not available */ }
+  }
+  const speakIf = t => { if (settings.voice) say(t, def && def.lang); };
+
+  /* ---------- mazes ---------- */
+  const CELL = 40, PAD = 8, STEP = 85;
+  function adj(m, a) {
+    const c = a % m.cols, r = Math.floor(a / m.cols), out = [];
+    if (r > 0) out.push(a - m.cols);
+    if (c < m.cols - 1) out.push(a + 1);
+    if (r < m.rows - 1) out.push(a + m.cols);
+    if (c > 0) out.push(a - 1);
+    return out;
+  }
+  function setWall(m, a, b, v) {
+    if (b === a + 1) m.E[a] = v; else if (b === a - 1) m.E[b] = v;
+    else if (b === a + m.cols) m.S[a] = v; else if (b === a - m.cols) m.S[b] = v;
+  }
+  function isOpen(m, a, b) {
+    if (b < 0 || b >= m.n) return false;
+    if (b === a + 1) return a % m.cols < m.cols - 1 && !m.E[a];
+    if (b === a - 1) return a % m.cols > 0 && !m.E[b];
+    if (b === a + m.cols) return !m.S[a];
+    if (b === a - m.cols) return !m.S[b];
+    return false;
+  }
+  const openNb = (m, a) => adj(m, a).filter(b => isOpen(m, a, b));
+  function squareOpen(m, r, c) {
+    if (r < 0 || c < 0 || r >= m.rows - 1 || c >= m.cols - 1) return false;
+    const a = r * m.cols + c;
+    return !m.E[a] && !m.E[a + m.cols] && !m.S[a] && !m.S[a + 1];
+  }
+  // a winding maze with long corridors, plus a few extra openings so there is more than one way around
+  function makeMaze(cols, rows, loops) {
+    const n = cols * rows;
+    const m = { cols, rows, n, E: new Uint8Array(n).fill(1), S: new Uint8Array(n).fill(1) };
+    const seen = new Uint8Array(n), first = rand(n), stack = [first];
+    seen[first] = 1;
+    while (stack.length) {
+      const a = stack[stack.length - 1];
+      const opts = adj(m, a).filter(b => !seen[b]);
+      if (!opts.length) { stack.pop(); continue; }
+      const b = pick(opts);
+      setWall(m, a, b, 0);
+      seen[b] = 1;
+      stack.push(b);
+    }
+    if (loops > 0) {
+      const walls = [];
+      for (let i = 0; i < n; i++) {
+        if (i % cols < cols - 1 && m.E[i]) walls.push([i, i + 1]);
+        if (i + cols < n && m.S[i]) walls.push([i, i + cols]);
+      }
+      shuffle(walls);
+      const want = Math.round(n * loops);
+      let made = 0;
+      for (const [a, b] of walls) {
+        if (made >= want) break;
+        setWall(m, a, b, 0);
+        const r = Math.floor(a / cols), c = a % cols;
+        const room = b === a + 1 ? squareOpen(m, r - 1, c) || squareOpen(m, r, c) : squareOpen(m, r, c - 1) || squareOpen(m, r, c);
+        if (room) setWall(m, a, b, 1); else made++;
+      }
+    }
+    return m;
+  }
+  function bfs(m, src, blocked) {
+    const d = new Int32Array(m.n).fill(-1), q = [src];
+    d[src] = 0;
+    for (let h = 0; h < q.length; h++) {
+      const a = q[h];
+      for (const b of openNb(m, a)) if (d[b] < 0 && !(blocked && blocked(b))) { d[b] = d[a] + 1; q.push(b); }
+    }
+    return d;
+  }
+  function bfsMulti(m, srcs) {
+    const d = new Int32Array(m.n).fill(-1), q = srcs.slice();
+    srcs.forEach(s => { d[s] = 0; });
+    for (let h = 0; h < q.length; h++) {
+      const a = q[h];
+      for (const b of openNb(m, a)) if (d[b] < 0) { d[b] = d[a] + 1; q.push(b); }
+    }
+    return d;
+  }
+  // the cells to walk from src to dst (not including src); null if dst is further than `limit` steps
+  function route(m, src, dst, limit) {
+    if (src === dst) return [];
+    const par = new Int32Array(m.n).fill(-1), dep = new Int32Array(m.n).fill(-1), q = [src];
+    dep[src] = 0;
+    for (let h = 0; h < q.length; h++) {
+      const a = q[h];
+      if (limit && dep[a] >= limit) continue;
+      for (const b of openNb(m, a)) {
+        if (dep[b] >= 0) continue;
+        dep[b] = dep[a] + 1;
+        par[b] = a;
+        if (b === dst) { const out = []; for (let x = dst; x !== src; x = par[x]) out.push(x); return out.reverse(); }
+        q.push(b);
+      }
+    }
+    return null;
+  }
+  const cxOf = (m, i) => PAD + (i % m.cols) * CELL + CELL / 2;
+  const cyOf = (m, i) => PAD + Math.floor(i / m.cols) * CELL + CELL / 2;
+  function wallPath(m) {
+    let d = '';
+    for (let r = 0; r < m.rows; r++) for (let c = 0; c < m.cols; c++) {
+      const i = r * m.cols + c, x = PAD + c * CELL, y = PAD + r * CELL;
+      if (r === 0) d += 'M' + x + ' ' + y + 'h' + CELL;
+      if (c === 0) d += 'M' + x + ' ' + y + 'v' + CELL;
+      if (m.E[i]) d += 'M' + (x + CELL) + ' ' + y + 'v' + CELL;
+      if (m.S[i]) d += 'M' + x + ' ' + (y + CELL) + 'h' + CELL;
+    }
+    return d;
+  }
+
+  /* ---------- Leo and Mia ---------- */
+  const PEOPLE = {
+    leo: { name: 'Leo', pron: 'his', subj: 'He', girl: false, skin: '#f3c9a6', hair: '#7a4a2a',
+      col: { pj: '#9cc3ff', pants: '#8ec9ff', sock: '#ff6b6b', tee: '#ffd23f', trousers: '#3d6fd6', sweater: '#ff7a3d', sweater2: '#ffb58f', jacket: '#2fa36b', jacket2: '#1f7a4c', shoes: '#8a4b2a', hat: '#3b7be8', hatBand: '#2a5fc4', pom: '#ffffff' },
+      items: ['underwear', 'socks', 'tshirt', 'trousers', 'sweater', 'jacket', 'shoes', 'hat'] },
+    mia: { name: 'Mia', pron: 'her', subj: 'She', girl: true, skin: '#c98d63', hair: '#3a2216',
+      col: { pj: '#e6b8ff', pants: '#ffb3cf', tights: '#8e63f2', tee: '#3ccb7f', skirt: '#ff5d6c', skirt2: '#d23f4f', sweater: '#ffc23d', sweater2: '#ffe39a', jacket: '#4a6cf7', jacket2: '#3049c4', shoes: '#d94f8c', hat: '#ff5da2', hatBand: '#d9408a', pom: '#ffffff' },
+      items: ['underwear', 'tights', 'tshirt', 'skirt', 'sweater', 'jacket', 'shoes', 'hat'] }
+  };
+  const GNAME = { underwear: 'underwear', socks: 'socks', tights: 'tights', tshirt: 'T-shirt', trousers: 'trousers', skirt: 'skirt', sweater: 'sweater', jacket: 'jacket', shoes: 'shoes', hat: 'hat' };
+  // what has to be on before each item, with the reason a child hears
+  const RULES = {
+    underwear: [],
+    socks: [['underwear', 'Underwear goes on first.']],
+    tights: [['underwear', 'Underwear goes on first.']],
+    tshirt: [['underwear', 'Underwear goes on first.']],
+    trousers: [['underwear', 'Underwear goes on before trousers.']],
+    skirt: [['tights', 'Tights go on before the skirt.']],
+    sweater: [['tshirt', 'The T-shirt goes on under the sweater.']],
+    jacket: [['sweater', 'The sweater goes on under the jacket.']],
+    hat: [['sweater', 'The sweater goes over your head, so put it on before the hat.']]
+  };
+  const needsFor = (who, id) => id !== 'shoes' ? RULES[id]
+    : who === 'leo' ? [['socks', 'Socks go on before shoes.'], ['trousers', 'Trousers go on before shoes.']]
+    : [['tights', 'Tights go on before shoes.']];
+  const GBOX = { underwear: '56 98 88 124', socks: '54 268 92 62', tights: '52 180 96 152', tshirt: '34 96 132 112', trousers: '56 178 88 130', skirt: '46 178 108 92', sweater: '34 94 132 124', jacket: '30 92 140 132', shoes: '54 296 92 40', hat: '48 0 104 72' };
+  const GARMENT = {
+    underwear: c => '<path class="o" d="M64 114Q64 104 76 104L86 104Q100 114 114 104L124 104Q136 104 136 114L136 196L64 196Z" fill="#ffffff"/>' +
+      '<path class="o" d="M66 186H134V204Q130 218 114 216Q104 215 100 206Q96 215 86 216Q70 218 66 204Z" fill="' + c.pants + '"/>',
+    socks: c => '<path class="o" d="M72 276H96V312Q96 324 84 324H70Q60 324 62 314Q63 306 72 304Z" fill="' + c.sock + '"/>' +
+      '<path class="o" d="M104 276H128V304Q137 306 138 314Q140 324 130 324H116Q104 324 104 312Z" fill="' + c.sock + '"/>' +
+      '<path d="M74 285H94M106 285H126" stroke="#fff" stroke-width="5"/>',
+    tights: c => '<path class="o" d="M68 186H132L131 304Q139 308 139 316Q140 326 128 326H114Q102 326 102 314V222Q100 214 98 222V314Q98 326 86 326H72Q60 326 61 316Q61 308 69 304Z" fill="' + c.tights + '"/>',
+    tshirt: c => '<path class="o" d="M64 112Q66 102 80 102L88 102Q100 112 112 102L120 102Q134 102 136 112L160 132L150 150L136 142L136 198Q100 206 64 198L64 142L50 150L40 132Z" fill="' + c.tee + '"/>' +
+      '<path d="M100 136l4.5 9 10 1.4-7.3 7 1.8 10-9-4.8-9 4.8 1.8-10-7.3-7 10-1.4z" fill="#fff" opacity=".9"/>',
+    trousers: c => '<path class="o" d="M66 184H134L133 302H104L102 220Q100 214 98 220L96 302H67Z" fill="' + c.trousers + '"/>' +
+      '<path d="M74 196Q80 204 88 196M112 196Q120 204 126 196" fill="none" stroke="rgba(0,0,0,.25)" stroke-width="2.5"/>',
+    skirt: c => '<path class="o" d="M68 184H132L148 254Q100 266 52 254Z" fill="' + c.skirt + '"/>' +
+      '<path d="M86 190L80 258M100 190V262M114 190L120 258" stroke="' + c.skirt2 + '" stroke-width="3" fill="none"/>',
+    sweater: c => '<path class="o" d="M62 112Q62 100 78 100L88 100Q100 110 112 100L122 100Q138 100 138 112L158 116L161 190L137 190L136 206Q100 214 64 206L63 190L39 190L42 116Z" fill="' + c.sweater + '"/>' +
+      '<path d="M64 134H136V148H64ZM42.5 134H63V148H42.5ZM137 134H158V148H137Z" fill="' + c.sweater2 + '"/>' +
+      '<path d="M41 182H62M138 182H159M66 198Q100 206 134 198" fill="none" stroke="rgba(0,0,0,.25)" stroke-width="2.5"/>',
+    jacket: c => '<path class="o" d="M60 112Q60 98 78 98L92 98L100 122L108 98L122 98Q140 98 140 112L161 116L164 196L138 196L138 214Q100 220 62 214L62 196L36 196L39 116Z" fill="' + c.jacket + '"/>' +
+      '<path d="M100 123V216" stroke="' + c.jacket2 + '" stroke-width="3"/>' +
+      '<path d="M70 178H88V192H70ZM112 178H130V192H112Z" fill="' + c.jacket2 + '" opacity=".6"/>',
+    shoes: c => '<path class="o" d="M62 316Q62 304 76 304H92Q98 304 98 312V322Q98 330 90 330H68Q60 330 62 316Z" fill="' + c.shoes + '"/>' +
+      '<path class="o" d="M102 312Q102 304 108 304H124Q138 304 138 316Q140 330 132 330H110Q102 330 102 322Z" fill="' + c.shoes + '"/>' +
+      '<path d="M64 325H97M103 325H136" stroke="#fff" stroke-width="3"/>',
+    hat: c => '<path class="o" d="M58 60Q56 20 100 18Q144 20 142 60Z" fill="' + c.hat + '"/>' +
+      '<rect class="o" x="54" y="50" width="92" height="17" rx="8.5" fill="' + c.hatBand + '"/>' +
+      '<circle class="o" cx="100" cy="15" r="11" fill="' + c.pom + '"/>'
+  };
+  // they start the maze in their pyjamas
+  const pyjamas = c => '<path class="o" d="M66 186H134L133 304H104L102 222Q100 216 98 222L96 304H67Z" fill="' + c.pj + '"/>' +
+    '<path class="o" d="M62 112Q62 100 78 100L88 100Q100 110 112 100L122 100Q138 100 138 112L158 116L160 190L136 190L136 206Q100 214 64 206L64 190L40 190L42 116Z" fill="' + c.pj + '"/>' +
+    '<g fill="#fff" opacity=".85"><circle cx="80" cy="132" r="3.5"/><circle cx="114" cy="152" r="3.5"/><circle cx="90" cy="178" r="3.5"/><circle cx="124" cy="124" r="3.5"/><circle cx="52" cy="150" r="3"/><circle cx="148" cy="166" r="3"/><circle cx="82" cy="236" r="3.5"/><circle cx="118" cy="264" r="3.5"/><circle cx="84" cy="286" r="3"/><circle cx="116" cy="226" r="3"/></g>';
+  function behindHead(P) {
+    if (P.girl) return '<path class="o" d="M58 66C52 98 54 122 64 134Q100 142 136 134C146 122 148 98 142 66Z" fill="' + P.hair + '"/>' +
+      '<circle class="o" cx="50" cy="60" r="14" fill="' + P.hair + '"/><circle class="o" cx="150" cy="60" r="14" fill="' + P.hair + '"/>';
+    return '<circle class="o" cx="61" cy="70" r="9" fill="' + P.skin + '"/><circle class="o" cx="139" cy="70" r="9" fill="' + P.skin + '"/>';
+  }
+  function headMarkup(P, hatOn) {
+    let m = '<circle class="o" cx="100" cy="64" r="40" fill="' + P.skin + '"/>' +
+      '<ellipse cx="86" cy="68" rx="4.5" ry="6" fill="#2f2a3a"/><ellipse cx="114" cy="68" rx="4.5" ry="6" fill="#2f2a3a"/>' +
+      '<circle cx="87.6" cy="65.5" r="1.6" fill="#fff"/><circle cx="115.6" cy="65.5" r="1.6" fill="#fff"/>' +
+      '<circle cx="76" cy="82" r="6" fill="#ff8fa3" opacity=".45"/><circle cx="124" cy="82" r="6" fill="#ff8fa3" opacity=".45"/>' +
+      '<path d="M88 84Q100 94 112 84" fill="none" stroke="#2f2a3a" stroke-width="3" stroke-linecap="round"/>';
+    if (P.girl) m += '<path class="o" d="M60 64C58 32 78 22 100 22C122 22 142 32 140 64C134 50 120 44 106 48C98 42 82 44 74 52C68 54 63 58 60 64Z" fill="' + P.hair + '"/>' +
+      (hatOn ? '' : '<path class="o" d="M138 34l-12-8v16zM138 34l12-8v16z" fill="#ff5d8f"/><circle class="o" cx="138" cy="34" r="4" fill="#ff5d8f"/>');
+    else m += '<path class="o" d="M60 62C58 34 76 22 100 22C124 22 142 34 140 62C136 52 128 46 118 46C112 38 98 36 92 44C82 40 70 46 66 54C64 56 62 58 60 62Z" fill="' + P.hair + '"/>';
+    return m;
+  }
+  const headToken = P => behindHead(P) + headMarkup(P);
+  const LAYERS = ['underwear', 'socks', 'tights', 'tshirt', 'trousers', 'skirt', 'sweater', 'jacket', 'shoes'];
+  function characterMarkup(P, worn, fresh) {
+    const s = P.skin;
+    let m = behindHead(P) +
+      '<circle class="o" cx="54" cy="198" r="10" fill="' + s + '"/><circle class="o" cx="146" cy="198" r="10" fill="' + s + '"/>' +
+      '<rect class="o" x="44" y="110" width="20" height="86" rx="10" fill="' + s + '"/><rect class="o" x="136" y="110" width="20" height="86" rx="10" fill="' + s + '"/>' +
+      '<rect class="o" x="72" y="194" width="24" height="116" rx="9" fill="' + s + '"/><rect class="o" x="104" y="194" width="24" height="116" rx="9" fill="' + s + '"/>' +
+      '<ellipse class="o" cx="80" cy="314" rx="16" ry="9" fill="' + s + '"/><ellipse class="o" cx="120" cy="314" rx="16" ry="9" fill="' + s + '"/>' +
+      '<rect x="90" y="96" width="20" height="22" fill="' + s + '"/>';
+    if (!worn.size) m += pyjamas(P.col);
+    LAYERS.forEach(id => { if (worn.has(id)) m += '<g class="gm' + (id === fresh ? ' new' : '') + '">' + GARMENT[id](P.col) + '</g>'; });
+    m += headMarkup(P, worn.has('hat'));
+    if (worn.has('hat')) m += '<g class="gm' + (fresh === 'hat' ? ' new' : '') + '">' + GARMENT.hat(P.col) + '</g>';
+    return m;
+  }
+  const kidSVG = (P, worn, fresh) => '<svg class="kid" viewBox="0 0 200 340" aria-hidden="true">' + characterMarkup(P, worn, fresh) + '</svg>';
+
+  /* ---------- small pictures ---------- */
+  const RAINBOW = [['red', '#f0464d'], ['orange', '#ff8a2a'], ['yellow', '#ffd23f'], ['green', '#2dbe6c'], ['blue', '#3d8bff'], ['purple', '#9b6bff']];
+  const KEYC = [['red', '#f0464d'], ['blue', '#3d8bff'], ['yellow', '#ffc531']];
+  function rainbowSVG(k) {
+    const R = [54, 47, 40, 33, 26, 19];
+    let s = '<svg class="rb" viewBox="0 0 120 68" aria-hidden="true">';
+    RAINBOW.forEach((c, i) => {
+      const r = R[i];
+      s += '<path d="M' + (60 - r) + ' 62A' + r + ' ' + r + ' 0 0 1 ' + (60 + r) + ' 62"' + (i < k ? ' stroke="' + c[1] + '"' : ' class="rb-off"') + ' fill="none" stroke-width="6.4" stroke-linecap="round"/>';
+    });
+    return s + '<g class="cloud"><circle cx="9" cy="61" r="6.5"/><circle cx="17" cy="57" r="8"/><circle cx="25" cy="62" r="6"/><circle cx="95" cy="62" r="6"/><circle cx="103" cy="57" r="8"/><circle cx="111" cy="61" r="6.5"/></g></svg>';
+  }
+  const crayon = hex => '<g transform="rotate(-35 20 20)"><path class="o2" d="M7 15H29L37 20L29 25H7Q5 25 5 23V17Q5 15 7 15Z" fill="' + hex + '"/><path d="M12 15.8V24.2M24 15.8V24.2" stroke="rgba(0,0,0,.3)" stroke-width="2"/><path d="M33.6 17.8L37 20L33.6 22.2Z" fill="rgba(0,0,0,.35)"/></g>';
+  const keyIcon = hex => '<circle class="o2" cx="13" cy="20" r="8" fill="' + hex + '"/><circle class="keyhole" cx="13" cy="20" r="3"/><path class="o2" d="M20.5 17.5H36V22.5H33V27H29.5V22.5H27V26H23.5V22.5H20.5Z" fill="' + hex + '"/>';
+  const doorMarkup = hex => '<g class="dr"><rect class="door-r" x="-17" y="-17" width="34" height="34" rx="6" fill="' + hex + '"/><path d="M-17 -6H17M-17 6H17" stroke="rgba(0,0,0,.2)" stroke-width="2"/><circle cx="0" cy="-2" r="4.6" fill="#1d2a55"/><path d="M-2.4 0H2.4L3.8 9H-3.8Z" fill="#1d2a55"/></g>';
+  const emoMarkup = (e, size) => '<text class="emo" font-size="' + size + '" dy=".35em">' + e + '</text>';
+  const numMarkup = v => '<circle class="nb" r="16"/><text class="nt" dy=".35em">' + v + '</text>';
+  const letterMarkup = ch => '<circle class="lb" r="16.5"/><text class="lt" dy=".36em">' + ch + '</text>';
+  const garmentIcon = (P, id) => '<svg x="-19" y="-19" width="38" height="38" viewBox="' + GBOX[id] + '">' + GARMENT[id](P.col) + '</svg>';
+  const box = (inner, s) => '<svg x="' + (-s / 2) + '" y="' + (-s / 2) + '" width="' + s + '" height="' + s + '" viewBox="0 0 40 40">' + inner + '</svg>';
+  const trailDots = '<svg class="tdots" viewBox="0 0 48 16" aria-hidden="true"><path d="M4 11Q24 1 44 11"/></svg>';
+
+  /* ---------- the games ---------- */
+  const SECTIONS = ['Find the way out', 'Numbers', 'Getting dressed', 'More puzzles'];
+  const GAMES = [
+    { id: 'mouse', sec: 0, mode: 'classic', name: 'Mouse and cheese', desc: 'A small maze', player: '🐭', goal: '🧀', who: 'the mouse', size: 42, loops: 0.04, color: '#ff8a2a',
+      goalText: 'Help the mouse find the cheese!', winTitle: 'Yum!', winText: 'The mouse found the cheese.' },
+    { id: 'bee', sec: 0, mode: 'classic', name: 'Busy bee', desc: 'A bigger maze', player: '🐝', goal: '🌻', who: 'the bee', size: 100, loops: 0.05, color: '#2dbe6c',
+      goalText: 'Help the bee find the flower!', winTitle: 'Buzz buzz!', winText: 'The bee found the flower.' },
+    { id: 'rocket', sec: 0, mode: 'classic', name: 'To the moon', desc: 'A giant maze', player: '🚀', goal: '🌙', who: 'the rocket', size: 190, loops: 0.05, color: '#9b6bff',
+      goalText: 'Fly the rocket to the moon!', winTitle: 'Moon landing!', winText: 'The rocket made it to the moon.' },
+    { id: 'up', sec: 1, mode: 'numbers', dir: 1, name: 'Count up', player: '🐸', who: 'the frog', loops: 0.12, color: '#3d8bff' },
+    { id: 'down', sec: 1, mode: 'numbers', dir: -1, name: 'Count down', player: '🐰', who: 'the bunny', loops: 0.12, color: '#ff5fa2' },
+    { id: 'leo', sec: 2, mode: 'dress', person: 'leo', name: 'Dress Leo', desc: 'Pick up his clothes in the right order', size: 90, loops: 0.12, color: '#ff8a2a' },
+    { id: 'mia', sec: 2, mode: 'dress', person: 'mia', name: 'Dress Mia', desc: 'Pick up her clothes in the right order', size: 90, loops: 0.12, color: '#9b6bff' },
+    { id: 'rainbow', sec: 3, mode: 'rainbow', name: 'Rainbow', desc: 'Pick up the crayons in rainbow order', player: '🦄', who: 'the unicorn', size: 72, loops: 0.12 },
+    { id: 'keys', sec: 3, mode: 'keys', name: 'Keys and doors', desc: 'Find each key, open its door, reach the treasure', player: '🦊', who: 'the fox', size: 110, loops: 0, color: '#ff8a2a' },
+    { id: 'animals', sec: 3, mode: 'animals', name: 'Feed the animals', desc: 'Bring each animal the food it likes', player: '🚜', who: 'the tractor', size: 100, loops: 0.12, color: '#2dbe6c' },
+    { id: 'spell', sec: 3, mode: 'spell', lang: 'en', name: 'Spell it', desc: 'Collect the letters to spell three English words', player: '🦉', who: 'the owl', loops: 0.1, color: '#3d8bff' },
+    { id: 'parole', sec: 3, mode: 'spell', lang: 'it', name: 'Scrivi la parola', desc: 'Raccogli le lettere per scrivere tre parole italiane', player: '🦉', who: 'il gufo',
+      drag: 'Metti il dito sul gufo e trascinalo.', dragMouse: 'Usa le frecce della tastiera, oppure trascina il gufo con il mouse.', loops: 0.1, color: '#2dbe6c' }
+  ];
+  const PAIRS = [['🐰', 'rabbit', '🥕', 'carrot', 'carrots'], ['🐶', 'dog', '🦴', 'bone', 'bones'], ['🐱', 'cat', '🐟', 'fish', 'fish'],
+    ['🐒', 'monkey', '🍌', 'banana', 'bananas'], ['🐿️', 'squirrel', '🌰', 'nut', 'nuts'], ['🐻', 'bear', '🍯', 'honey', 'honey'], ['🐔', 'hen', '🌽', 'corn', 'corn']];
+  const W3 = [['CAT', '🐱'], ['DOG', '🐶'], ['SUN', '☀️'], ['BUS', '🚌'], ['PIG', '🐷'], ['COW', '🐮'], ['BEE', '🐝'], ['EGG', '🥚'], ['CAR', '🚗'], ['ANT', '🐜'], ['OWL', '🦉'], ['FOX', '🦊'], ['BED', '🛏️']];
+  const W4 = [['FISH', '🐟'], ['FROG', '🐸'], ['DUCK', '🦆'], ['CAKE', '🎂'], ['STAR', '⭐'], ['MOON', '🌙'], ['BOAT', '⛵'], ['BEAR', '🐻'], ['BIRD', '🐦'], ['TREE', '🌳'], ['BALL', '⚽'], ['LION', '🦁'], ['SHIP', '🚢'], ['MILK', '🥛'], ['CORN', '🌽'], ['BOOK', '📕']];
+  // Italian words: short, regular and easy to sound out
+  const IT_A = [['APE', '🐝'], ['UVA', '🍇'], ['SOLE', '☀️'], ['LUNA', '🌙'], ['CANE', '🐶'], ['MELA', '🍎'], ['CASA', '🏠'], ['NASO', '👃']];
+  const IT_B = [['TOPO', '🐭'], ['PERA', '🍐'], ['ORSO', '🐻'], ['UOVO', '🥚'], ['NAVE', '🚢'], ['RANA', '🐸'], ['LUPO', '🐺'], ['PANE', '🍞'], ['AUTO', '🚗'], ['DADO', '🎲'], ['MANO', '✋']];
+  const IT_C = [['GATTO', '🐱'], ['TORTA', '🎂'], ['PESCE', '🐟'], ['MUCCA', '🐮'], ['LEONE', '🦁'], ['TIGRE', '🐯'], ['TRENO', '🚆'], ['FIORE', '🌸'], ['PALLA', '⚽'],
+    ['BARCA', '⛵'], ['LIBRO', '📕'], ['LATTE', '🥛'], ['PIZZA', '🍕'], ['VOLPE', '🦊'], ['ZEBRA', '🦓'], ['PANDA', '🐼'], ['FUOCO', '🔥']];
+  const W5 = [['APPLE', '🍎'], ['HOUSE', '🏠'], ['TRAIN', '🚆'], ['HORSE', '🐴'], ['SNAKE', '🐍'], ['PIZZA', '🍕'], ['MOUSE', '🐭'], ['SHEEP', '🐑'], ['TIGER', '🐯'], ['CLOUD', '☁️']];
+
+  /* ---------- elements ---------- */
+  const E = {
+    sections: $('#sections'), hero: $('#hero'),
+    title: $('#playTitle'), hudVis: $('#hudVis'), hudGoal: $('#hudGoal'), hudMsg: $('#hudMsg'),
+    boardWrap: $('#boardWrap'), board: $('#board'), pad: $('#pad'),
+    win: $('#win'), winVis: $('#winVis'), winTitle: $('#winTitle'), winText: $('#winText'), winMain: $('#winMain'),
+    settings: $('#settings'), voiceRow: $('#voiceRow'), reset: $('#resetBtn'), closeSettings: $('#closeSettings'),
+    sayBtn: $('#sayBtn')
+  };
+
+  /* ---------- game state ---------- */
+  let def = null, M = null, G = null, B = {};
+  let current = 'home', sessionMoved = false;
+
+  function show(id) {
+    if (current === 'play' && id !== 'play') {
+      stopWalking();
+      if (canSpeak) { try { window.speechSynthesis.cancel(); } catch (e) { /* ignore */ } }
+    }
+    current = id;
+    $$('.screen').forEach(s => s.classList.toggle('active', s.id === id));
+    E.win.hidden = true;
+    if (id === 'home') { renderHome(); const sc = $('#home .scroll'); if (sc) sc.scrollTop = 0; }
+  }
+
+  function startGame(id) {
+    def = GAMES.find(g => g.id === id);
+    if (!def) return;
+    E.title.textContent = def.name;
+    show('play');
+    G = { round: 0, words: def.mode !== 'spell' ? null : def.lang === 'it' ? [pick(IT_A), pick(IT_B), pick(IT_C)] : [pick(W3), pick(W4), pick(W5)] };
+    const it = def.lang === 'it';
+    $('#newBtn span').textContent = it ? 'Nuovo labirinto' : 'New maze';
+    $('#newBtn').setAttribute('aria-label', it ? 'Nuovo labirinto' : 'New maze');
+    $('#hintBtn').setAttribute('aria-label', it ? 'Dammi un suggerimento' : 'Show me a hint');
+    E.sayBtn.setAttribute('aria-label', it ? 'Leggi ad alta voce' : 'Read it to me');
+    $('#win [data-go]').textContent = it ? 'Tutti i labirinti' : 'All mazes';
+    newMaze();
+  }
+
+  function newMaze() {
+    stopWalking();
+    E.win.hidden = true;
+    E.pad.hidden = !settings.pad;
+    const keep = { round: G ? G.round : 0, words: G ? G.words : null };
+    G = Object.assign({ items: new Map(), live: true, segs: [], mode: MODES[def.mode] }, keep);
+    G.mode.prepare();
+    renderHud();
+    G.introPending = !sessionMoved;
+    msg(sessionMoved ? G.mode.intro() : controlsMsg(), '');
+    const size = G.mode.size ? G.mode.size() : def.size;
+    const d = dims(size, G.mode.need ? G.mode.need() : 20);
+    M = makeMaze(d.cols, d.rows, def.loops);
+    drawBoard();
+    G.start = 0;
+    G.mode.setup();
+    drawPlayer();
+    placePlayer(G.start, true);
+    startTrail(G.trailColor || def.color);
+    renderHud();
+    E.board.setAttribute('aria-label', L('Maze. ', 'Labirinto. ') + G.goalText);
+    speakIf(G.goalSpoken);
+  }
+
+  function controlsMsg() {
+    if (def.lang === 'it') return window.matchMedia && window.matchMedia('(pointer: coarse)').matches ? def.drag : def.dragMouse;
+    const who = def.person ? PEOPLE[def.person].name : def.who;
+    const coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+    return coarse ? 'Put your finger on ' + who + ' and drag.' : 'Use the arrow keys, or drag ' + who + ' with the mouse pointer.';
+  }
+
+  // choose a grid that fills the space, with cells big enough for a finger
+  function dims(target, need) {
+    const r = E.boardWrap.getBoundingClientRect();
+    const W = Math.max(180, r.width), H = Math.max(180, r.height), pad = PAD * 2 / CELL;
+    let cols = clamp(Math.round(Math.sqrt(target * W / H)), 4, 26);
+    let rows = clamp(Math.round(target / cols), 4, 20);
+    const px = () => Math.min(W / (cols + pad), H / (rows + pad));
+    while (px() < 27 && cols * rows > need) {
+      if (W / (cols + pad) < H / (rows + pad)) { if (cols > 4) cols--; else rows--; }
+      else { if (rows > 4) rows--; else cols--; }
+    }
+    return { cols, rows };
+  }
+
+  function drawBoard() {
+    const W = M.cols * CELL + PAD * 2, H = M.rows * CELL + PAD * 2;
+    E.board.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+    E.board.innerHTML =
+      '<defs><pattern id="mzDots" width="20" height="20" patternUnits="userSpaceOnUse"><circle class="pdot" cx="' + PAD + '" cy="' + PAD + '" r="1.5"/></pattern></defs>' +
+      '<rect class="paper" x="1" y="1" width="' + (W - 2) + '" height="' + (H - 2) + '" rx="14"/>' +
+      '<rect x="1" y="1" width="' + (W - 2) + '" height="' + (H - 2) + '" rx="14" fill="url(#mzDots)"/>' +
+      '<g id="lTrail"></g><path class="walls" d="' + wallPath(M) + '"/>' +
+      '<g id="lDoors"></g><g id="lItems"></g><g id="lGoal"></g><g id="lHint"></g><g id="lPlayer"></g>';
+    B = { trail: $('#lTrail', E.board), doors: $('#lDoors', E.board), items: $('#lItems', E.board), goal: $('#lGoal', E.board), hint: $('#lHint', E.board), player: $('#lPlayer', E.board) };
+    E.board.classList.toggle('no-trail', !settings.trail);
+  }
+
+  function drawPlayer() {
+    const token = def.person
+      ? '<svg x="-20" y="-20" width="40" height="40" viewBox="34 4 132 132">' + headToken(PEOPLE[def.person]) + '</svg>'
+      : emoMarkup(def.player, 27);
+    B.player.innerHTML = '<g class="pl"><circle class="halo" r="17"/><g class="pl-in">' + token + '</g><g class="pl-carry"></g></g>';
+    B.pl = B.player.firstChild;
+    B.plIn = $('.pl-in', B.pl);
+    B.carry = $('.pl-carry', B.pl);
+  }
+  function placePlayer(i, instant) {
+    G.pos = i;
+    const t = 'translate(' + cxOf(M, i) + 'px,' + cyOf(M, i) + 'px)';
+    if (instant) {
+      B.pl.style.transition = 'none';
+      B.pl.style.transform = t;
+      void B.pl.getBoundingClientRect();
+      B.pl.style.transition = '';
+    } else B.pl.style.transform = t;
+  }
+  function drawGoal(cell, emoji) {
+    B.goal.innerHTML = '<g transform="translate(' + cxOf(M, cell) + ' ' + cyOf(M, cell) + ')"><circle class="goal-glow" r="19"/>' + emoMarkup(emoji, 29) + '</g>';
+  }
+  function addItem(cell, data, markup) {
+    const g = document.createElementNS(NS, 'g');
+    g.setAttribute('transform', 'translate(' + cxOf(M, cell) + ' ' + cyOf(M, cell) + ')');
+    g.innerHTML = '<g class="it">' + markup + '</g>';
+    B.items.appendChild(g);
+    const it = Object.assign({ cell, g, inner: g.firstChild }, data);
+    G.items.set(cell, it);
+    return it;
+  }
+  function collect(it) {
+    G.items.delete(it.cell);
+    it.inner.classList.add('out');
+    setTimeout(() => it.g.remove(), 440);
+    sfx.pick();
+  }
+  function reject(node) { restartAnim(node, 'nope'); sfx.nope(); }
+  function restartAnim(node, cls) {
+    if (!node) return;
+    node.classList.remove(cls);
+    void node.getBoundingClientRect();
+    node.classList.add(cls);
+  }
+
+  /* the crayon line */
+  function startTrail(color) { B.trail.innerHTML = ''; G.segs = []; newSeg(color); }
+  function newSeg(color) {
+    const p = document.createElementNS(NS, 'path');
+    p.setAttribute('class', 'trail');
+    p.setAttribute('stroke', color || '#ff8a2a');
+    B.trail.appendChild(p);
+    G.seg = { p, pts: [G.pos] };
+    G.segs.push(G.seg);
+    drawSeg();
+  }
+  function drawSeg() { const s = G.seg; s.p.setAttribute('d', 'M' + s.pts.map(i => cxOf(M, i) + ' ' + cyOf(M, i)).join('L')); }
+
+  /* hints */
+  let hintTimer = 0;
+  function clearHint() { clearTimeout(hintTimer); if (B.hint) B.hint.innerHTML = ''; }
+  function pulse(cells) {
+    clearHint();
+    B.hint.innerHTML = cells.map(c => '<circle class="hint-ring" cx="' + cxOf(M, c) + '" cy="' + cyOf(M, c) + '" r="19"/>').join('');
+    hintTimer = setTimeout(clearHint, 3200);
+  }
+  function pulseWhere(f) { const cells = []; G.items.forEach((it, c) => { if (f(it)) cells.push(c); }); pulse(cells); }
+  function showPath(cells) {
+    clearHint();
+    B.hint.innerHTML = cells.map((c, k) => '<circle class="hint-dot" cx="' + cxOf(M, c) + '" cy="' + cyOf(M, c) + '" r="5.5" style="animation-delay:' + (k * 80) + 'ms"/>').join('');
+    hintTimer = setTimeout(clearHint, 4200);
+  }
+
+  /* panel text */
+  function renderHud() {
+    const h = G.mode.hud();
+    E.hudVis.innerHTML = h.vis;
+    E.hudGoal.textContent = h.goal;
+    G.goalText = h.goal;
+    G.goalSpoken = h.spoken || h.goal;
+  }
+  function msg(text, kind) {
+    E.hudMsg.textContent = text || '';
+    E.hudMsg.className = 'hud-msg' + (kind ? ' ' + kind : '');
+  }
+  const say2 = (t, kind, spoken) => { msg(t, kind); speakIf(spoken || t); };
+
+  /* ---------- moving ---------- */
+  let queue = [], stepTimer = 0;
+  function stopWalking() { clearTimeout(stepTimer); stepTimer = 0; queue = []; dragging = false; clearInterval(padTimer); }
+  function go(path) { queue = path.slice(); if (!stepTimer) tick(); }
+  function tick() {
+    stepTimer = 0;
+    if (!G || !G.live || !queue.length) { queue = []; return; }
+    const next = queue.shift();
+    if (!enter(next)) { queue = []; return; }
+    stepTimer = setTimeout(tick, STEP);
+  }
+  function enter(next) {
+    if (!isOpen(M, G.pos, next)) { bump(dirOf(G.pos, next)); return false; }
+    if (G.mode.block && G.mode.block(next)) return false;
+    placePlayer(next);
+    G.seg.pts.push(next);
+    drawSeg();
+    if (G.introPending) { G.introPending = false; sessionMoved = true; msg(G.mode.intro(), ''); }
+    if (G.mode.enter) G.mode.enter(next);
+    return true;
+  }
+  const dirOf = (a, b) => (b === a + 1 ? 'r' : b === a - 1 ? 'l' : b === a + M.cols ? 'd' : 'u');
+  function stepFrom(a, dir) {
+    const c = a % M.cols, r = Math.floor(a / M.cols);
+    if (dir === 'u') return r > 0 ? a - M.cols : -1;
+    if (dir === 'd') return r < M.rows - 1 ? a + M.cols : -1;
+    if (dir === 'l') return c > 0 ? a - 1 : -1;
+    return c < M.cols - 1 ? a + 1 : -1;
+  }
+  function bump(dir) { restartAnim(B.plIn, 'bump-' + dir); sfx.bump(); }
+  function stepDir(dir) {
+    if (!G || !G.live || !E.win.hidden) return;
+    const to = stepFrom(G.pos, dir);
+    if (to < 0 || !isOpen(M, G.pos, to)) { if (!stepTimer) bump(dir); return; }
+    go([to]);
+  }
+
+  // dragging: the player walks to the cell under the finger when it is a few steps away
+  let dragging = false, lastT = -1;
+  function follow(e, isDown) {
+    const ctm = E.board.getScreenCTM();
+    if (!ctm || !M) return;
+    const sp = E.board.createSVGPoint();
+    sp.x = e.clientX;
+    sp.y = e.clientY;
+    const p = sp.matrixTransform(ctm.inverse());
+    const c = Math.floor((p.x - PAD) / CELL), r = Math.floor((p.y - PAD) / CELL);
+    if (c < 0 || r < 0 || c >= M.cols || r >= M.rows) return;
+    const t = r * M.cols + c;
+    if (t === lastT) return;
+    lastT = t;
+    if (t === G.pos) { queue = []; return; }
+    const path = route(M, G.pos, t, 6);
+    if (path) go(path);
+    else if (isDown) restartAnim(B.plIn, 'ping');
+  }
+  E.board.addEventListener('pointerdown', e => {
+    if (!G || !G.live) return;
+    e.preventDefault();
+    dragging = true;
+    lastT = -1;
+    try { E.board.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+    follow(e, true);
+  });
+  E.board.addEventListener('pointermove', e => { if (dragging && G && G.live) follow(e, false); });
+  ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(t => E.board.addEventListener(t, () => { dragging = false; }));
+
+  let padTimer = 0;
+  E.pad.addEventListener('pointerdown', e => {
+    const b = e.target.closest('[data-dir]');
+    if (!b) return;
+    e.preventDefault();
+    const d = b.dataset.dir;
+    stepDir(d);
+    clearInterval(padTimer);
+    padTimer = setInterval(() => stepDir(d), 150);
+    try { b.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+  });
+  ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(t => E.pad.addEventListener(t, () => clearInterval(padTimer)));
+  E.pad.addEventListener('click', e => { const b = e.target.closest('[data-dir]'); if (b && e.detail === 0) stepDir(b.dataset.dir); });
+
+  const KEYS = { ArrowUp: 'u', ArrowDown: 'd', ArrowLeft: 'l', ArrowRight: 'r', w: 'u', s: 'd', a: 'l', d: 'r', W: 'u', S: 'd', A: 'l', D: 'r' };
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && !E.settings.hidden) { closeSettings(); return; }
+    if (current !== 'play' || !E.settings.hidden || !E.win.hidden) return;
+    const d = KEYS[e.key];
+    if (!d) return;
+    e.preventDefault();
+    stepDir(d);
+  });
+
+  /* ---------- placing things ---------- */
+  const man = (a, b) => Math.abs(a % M.cols - b % M.cols) + Math.abs(Math.floor(a / M.cols) - Math.floor(b / M.cols));
+  // spread items out across the maze
+  function spread(count, avoid) {
+    const chosen = [], anchors = Array.from(avoid);
+    for (let k = 0; k < count; k++) {
+      let best = -1, bestScore = -1;
+      for (let t = 0; t < 30; t++) {
+        const c = rand(M.n);
+        if (avoid.has(c) || chosen.includes(c)) continue;
+        let score = 99;
+        anchors.concat(chosen).forEach(a => { score = Math.min(score, man(a, c)); });
+        score += Math.random() * 0.9;
+        if (score > bestScore) { bestScore = score; best = c; }
+      }
+      if (best < 0) {
+        const free = [];
+        for (let i = 0; i < M.n; i++) if (!avoid.has(i) && !chosen.includes(i)) free.push(i);
+        best = pick(free);
+      }
+      chosen.push(best);
+    }
+    return chosen;
+  }
+  // numbers: each next number a few steps from the one before, so the search stays nearby
+  function chainPlace(count, start) {
+    const used = new Set([start]), out = [];
+    const touching = c => adj(M, c).some(b => used.has(b));
+    let prev = start;
+    for (let k = 0; k < count; k++) {
+      const d = bfs(M, prev), free = [];
+      for (let i = 0; i < M.n; i++) if (!used.has(i)) free.push(i);
+      let cands = free.filter(i => d[i] >= 3 && d[i] <= 8 && !touching(i));
+      if (!cands.length) cands = free.filter(i => d[i] >= 2 && !touching(i));
+      if (!cands.length) cands = free.filter(i => d[i] >= 1);
+      if (!cands.length) cands = free;
+      const cell = pick(cands);
+      out.push(cell);
+      used.add(cell);
+      prev = cell;
+    }
+    return out;
+  }
+
+  /* ---------- the rules of each kind of maze ---------- */
+  const MODES = {};
+
+  MODES.classic = {
+    prepare() {},
+    setup() {
+      G.start = pick([0, M.cols - 1, M.n - M.cols, M.n - 1]);
+      const d = bfs(M, G.start);
+      let far = [], fd = -1;
+      for (let i = 0; i < M.n; i++) { if (d[i] > fd) { fd = d[i]; far = [i]; } else if (d[i] === fd) far.push(i); }
+      G.goal = pick(far);
+      drawGoal(G.goal, def.goal);
+    },
+    enter(i) {
+      if (i === G.goal) win({ vis: '<div class="win-emo">' + def.player + def.goal + '</div>', title: def.winTitle, text: def.winText });
+    },
+    hud() { return { vis: '<div class="duo"><span>' + def.player + '</span>' + trailDots.replace('tdots', '') + '<span>' + def.goal + '</span></div>', goal: def.goalText }; },
+    intro() { return 'Find a path through the maze.'; },
+    hint() { const p = route(M, G.pos, G.goal, 0); if (p) showPath(p.slice(0, 12)); msg('Follow the dots!', 'hint'); }
+  };
+
+  MODES.numbers = {
+    prepare() {
+      G.N = settings.upTo;
+      G.seq = [];
+      for (let v = 1; v <= G.N; v++) G.seq.push(v);
+      if (def.dir < 0) G.seq.reverse();
+      G.k = 0;
+    },
+    size() { return G.N === 20 ? 150 : 90; },
+    need() { return G.N + 12; },
+    setup() { chainPlace(G.seq.length, G.start).forEach((c, k) => addItem(c, { v: G.seq[k] }, numMarkup(G.seq[k]))); },
+    enter(i) {
+      const it = G.items.get(i);
+      if (!it) return;
+      const want = G.seq[G.k];
+      if (it.v !== want) { reject(it.inner); say2('That’s ' + it.v + '. Find ' + want + ' first!', 'bad', 'Find ' + want + ' first'); return; }
+      collect(it);
+      G.k++;
+      renderHud();
+      if (G.k >= G.seq.length) {
+        win(def.dir > 0
+          ? { vis: '<div class="win-emo">🎉</div>', title: 'You did it!', text: 'You counted all the way to ' + G.N + '.' }
+          : { vis: '<div class="win-emo">🚀</div>', title: 'Blast off!', text: 'You counted down from ' + G.N + ' to 1.' });
+        return;
+      }
+      say2('Now find ' + G.seq[G.k] + '.', 'good');
+    },
+    hud() {
+      const fin = G.k >= G.seq.length, want = fin ? null : G.seq[G.k];
+      let grid = '<div class="ngrid">';
+      for (let v = 1; v <= G.N; v++) {
+        const got = fin || (def.dir > 0 ? v < want : v > want);
+        grid += '<span class="ng' + (got ? ' got' : '') + (v === want ? ' next' : '') + '">' + v + '</span>';
+      }
+      grid += '</div>';
+      return { vis: '<div class="vis-compact"><span class="big-num">' + (fin ? '✓' : want) + '</span></div><div class="vis-full">' + grid + '</div>', goal: fin ? 'All done!' : 'Find ' + want };
+    },
+    intro() { return def.dir > 0 ? 'Go to 1, then 2, then 3, all the way to ' + G.N + '.' : 'Go to ' + G.N + ', then ' + (G.N - 1) + ', then ' + (G.N - 2) + ', all the way down to 1.'; },
+    hint() { const want = G.seq[G.k]; pulseWhere(it => it.v === want); msg('Look for the glowing ' + want + '!', 'hint'); }
+  };
+
+  MODES.dress = {
+    prepare() { G.P = PEOPLE[def.person]; G.worn = new Set(); G.fresh = null; },
+    setup() {
+      const ids = shuffle(G.P.items.slice());
+      const cells = spread(ids.length, new Set([G.start]));
+      // keep the underwear away from the start, so other clothes are found first
+      const d = bfs(M, G.start), u = ids.indexOf('underwear');
+      if (d[cells[u]] < 5) {
+        let far = 0;
+        cells.forEach((c, j) => { if (d[c] > d[cells[far]]) far = j; });
+        ids[u] = ids[far];
+        ids[far] = 'underwear';
+      }
+      ids.forEach((id, j) => addItem(cells[j], { id }, garmentIcon(G.P, id)));
+    },
+    enter(i) {
+      const it = G.items.get(i);
+      if (!it) return;
+      const P = G.P, miss = needsFor(def.person, it.id).find(n => !G.worn.has(n[0]));
+      if (miss) { reject(it.inner); say2('Not yet! ' + miss[1], 'bad', miss[1]); return; }
+      collect(it);
+      G.worn.add(it.id);
+      G.fresh = it.id;
+      renderHud();
+      G.fresh = null;
+      if (G.worn.size === P.items.length) {
+        win({ vis: kidSVG(P, G.worn), title: P.name + ' is dressed!', text: P.subj + '’s ready to go and play outside.' });
+        return;
+      }
+      say2(P.name + ' put on ' + P.pron + ' ' + GNAME[it.id] + '.', 'good');
+    },
+    hud() { return { vis: kidSVG(G.P, G.worn, G.fresh), goal: 'Get ' + G.P.name + ' dressed!' }; },
+    intro() { return 'Pick up ' + G.P.pron + ' clothes in the right order.'; },
+    hint() {
+      const ready = [];
+      G.items.forEach((it, c) => { if (!needsFor(def.person, it.id).some(n => !G.worn.has(n[0]))) ready.push(c); });
+      pulse(ready);
+      msg(ready.length > 1 ? 'Any of the glowing clothes can go on now.' : 'The glowing one goes on next.', 'hint');
+    }
+  };
+
+  MODES.rainbow = {
+    prepare() { G.k = 0; G.trailColor = '#a3acc2'; },
+    setup() {
+      const order = shuffle(RAINBOW.map((_, j) => j)), cells = spread(order.length, new Set([G.start]));
+      order.forEach((j, t) => addItem(cells[t], { c: j }, box(crayon(RAINBOW[j][1]), 36)));
+    },
+    enter(i) {
+      const it = G.items.get(i);
+      if (!it) return;
+      if (it.c !== G.k) { reject(it.inner); say2('Not yet! Find the ' + RAINBOW[G.k][0] + ' crayon first.', 'bad'); return; }
+      collect(it);
+      G.k++;
+      newSeg(RAINBOW[it.c][1]);
+      renderHud();
+      if (G.k === RAINBOW.length) { win({ vis: rainbowSVG(6), title: 'A rainbow!', text: 'You picked up the crayons in rainbow order.' }); return; }
+      say2(cap(RAINBOW[it.c][0]) + '! Now find ' + RAINBOW[G.k][0] + '.', 'good');
+    },
+    hud() { return { vis: rainbowSVG(G.k), goal: G.k < RAINBOW.length ? 'Find the ' + RAINBOW[G.k][0] + ' crayon' : 'Rainbow done!' }; },
+    intro() { return 'Red, orange, yellow, green, blue, purple.'; },
+    hint() { pulseWhere(it => it.c === G.k); msg('Look for the glowing crayon!', 'hint'); }
+  };
+
+  MODES.keys = {
+    prepare() { G.doors = []; G.have = new Set(); },
+    setup() {
+      const d0 = bfs(M, G.start);
+      let goal = G.start;
+      for (let i = 0; i < M.n; i++) if (d0[i] > d0[goal]) goal = i;
+      const P = [G.start].concat(route(M, G.start, goal, 0) || []), L = P.length;
+      const nd = L >= 30 ? 3 : L >= 14 ? 2 : 1;
+      const doorCells = [];
+      for (let k = 1; k <= nd; k++) doorCells.push(P[clamp(Math.round((L - 1) * k / (nd + 1)), 2, L - 2)]);
+      const onPath = new Set(P), depth = bfsMulti(M, P), used = new Set([G.start, goal].concat(doorCells));
+      G.doors = doorCells.map((cell, k) => ({ cell, k, open: false, g: null }));
+      // each key sits in the part of the maze you can already reach, ideally down a side path
+      let before = new Set();
+      for (let k = 0; k < nd; k++) {
+        const closed = new Set(doorCells.slice(k)), reach = bfs(M, G.start, b => closed.has(b)), region = [];
+        for (let i = 0; i < M.n; i++) if (reach[i] >= 0 && !before.has(i) && !used.has(i)) region.push(i);
+        let pool = region.filter(i => !onPath.has(i));
+        if (pool.length) { let mx = 0; pool.forEach(i => { mx = Math.max(mx, depth[i]); }); pool = pool.filter(i => depth[i] >= mx - 1); }
+        else pool = region;
+        if (!pool.length) for (let i = 0; i < M.n; i++) if (reach[i] >= 0 && !used.has(i)) pool.push(i);
+        const cell = pick(pool);
+        used.add(cell);
+        addItem(cell, { key: k }, box(keyIcon(KEYC[k][1]), 42));
+        before = new Set();
+        for (let i = 0; i < M.n; i++) if (reach[i] >= 0) before.add(i);
+      }
+      G.doors.forEach(dr => {
+        const g = document.createElementNS(NS, 'g');
+        g.setAttribute('transform', 'translate(' + cxOf(M, dr.cell) + ' ' + cyOf(M, dr.cell) + ')');
+        g.innerHTML = doorMarkup(KEYC[dr.k][1]);
+        B.doors.appendChild(g);
+        dr.g = g;
+      });
+      G.goal = goal;
+      drawGoal(goal, '💎');
+    },
+    block(next) {
+      const dr = G.doors.find(x => x.cell === next && !x.open);
+      if (!dr) return false;
+      const name = KEYC[dr.k][0];
+      if (G.have.has(dr.k)) {
+        dr.open = true;
+        dr.g.firstChild.classList.add('out');
+        setTimeout(() => dr.g.remove(), 460);
+        sfx.door();
+        renderHud();
+        say2('The ' + name + ' door is open!', 'good');
+        return false;
+      }
+      bump(dirOf(G.pos, next));
+      reject(dr.g.firstChild);
+      say2('Locked! Find the ' + name + ' key.', 'bad');
+      return true;
+    },
+    enter(i) {
+      const it = G.items.get(i);
+      if (it) {
+        collect(it);
+        G.have.add(it.key);
+        renderHud();
+        const name = KEYC[it.key][0];
+        say2('You found the ' + name + ' key! Now find the ' + name + ' door.', 'good');
+      }
+      if (i === G.goal) win({ vis: '<div class="win-emo">💎</div>', title: 'Treasure!', text: 'You opened every door and found the treasure.' });
+    },
+    hud() {
+      const slots = G.doors.length ? G.doors : [{ k: 0, open: false }, { k: 1, open: false }];
+      let s = '<div class="krow">';
+      slots.forEach(dr => { s += '<span class="kslot' + (G.have.has(dr.k) || dr.open ? ' have' : '') + (dr.open ? ' used' : '') + '"><svg viewBox="0 0 40 40">' + keyIcon(KEYC[dr.k][1]) + '</svg></span>'; });
+      return { vis: s + '<span class="kgem">💎</span></div>', goal: keysGoal() };
+    },
+    intro() { return 'Each key opens the door that matches it.'; },
+    hint() {
+      for (const dr of G.doors) {
+        if (dr.open) continue;
+        if (G.have.has(dr.k)) { pulse([dr.cell]); msg('Take the ' + KEYC[dr.k][0] + ' key to the glowing door.', 'hint'); }
+        else { pulseWhere(it => it.key === dr.k); msg('The ' + KEYC[dr.k][0] + ' key is glowing!', 'hint'); }
+        return;
+      }
+      pulse([G.goal]);
+      msg('The treasure is glowing!', 'hint');
+    }
+  };
+  function keysGoal() {
+    for (const dr of G.doors) {
+      if (dr.open) continue;
+      return G.have.has(dr.k) ? 'Open the ' + KEYC[dr.k][0] + ' door' : 'Find the ' + KEYC[dr.k][0] + ' key';
+    }
+    return G.doors.length ? 'Find the treasure!' : 'Find the keys';
+  }
+
+  MODES.animals = {
+    prepare() { G.pairs = shuffle(PAIRS.slice()).slice(0, 4); G.carry = null; G.fed = new Set(); },
+    setup() {
+      const cells = spread(8, new Set([G.start]));
+      let a = cells.slice(0, 4), f = cells.slice(4);
+      for (let t = 0; t < 40; t++) {
+        if (G.pairs.every((p, j) => man(a[j], f[j]) >= 4)) break;
+        shuffle(cells);
+        a = cells.slice(0, 4);
+        f = cells.slice(4);
+      }
+      G.pairs.forEach((p, j) => {
+        addItem(a[j], { kind: 'animal', p: j }, emoMarkup(p[0], 28));
+        addItem(f[j], { kind: 'food', p: j }, emoMarkup(p[2], 25));
+      });
+    },
+    enter(i) {
+      const it = G.items.get(i);
+      if (!it) return;
+      const p = G.pairs[it.p];
+      if (it.kind === 'food') {
+        if (G.carry !== null) { reject(it.inner); say2('Your hands are full! Who eats ' + G.pairs[G.carry][4] + '?', 'hint'); return; }
+        G.carry = it.p;
+        collect(it);
+        showCarry();
+        renderHud();
+        say2('You picked up the ' + p[3] + '. Who eats ' + p[4] + '?', 'good');
+        return;
+      }
+      if (G.fed.has(it.p)) { msg('The ' + p[1] + ' is full and happy.', ''); return; }
+      if (G.carry === null) { restartAnim(it.inner, 'wig'); sfx.nope(); say2('The ' + p[1] + ' is hungry! Find its food.', 'hint'); return; }
+      if (G.carry !== it.p) { reject(it.inner); say2('The ' + p[1] + ' doesn’t eat ' + G.pairs[G.carry][4] + '.', 'bad'); return; }
+      G.fed.add(it.p);
+      G.carry = null;
+      showCarry();
+      sfx.pick();
+      const heart = document.createElementNS(NS, 'text');
+      heart.setAttribute('class', 'emo');
+      heart.setAttribute('font-size', '15');
+      heart.setAttribute('x', '13');
+      heart.setAttribute('y', '-13');
+      heart.setAttribute('dy', '.35em');
+      heart.textContent = '❤️';
+      it.inner.appendChild(heart);
+      restartAnim(it.inner, 'wig');
+      renderHud();
+      if (G.fed.size === G.pairs.length) { win({ vis: animalsVis(true), title: 'All fed!', text: 'Every animal got the food it likes.' }); return; }
+      say2('Yum! The ' + p[1] + ' loves ' + p[4] + '.', 'good');
+    },
+    hud() {
+      const carry = G.carry === null ? '' : G.pairs[G.carry][2];
+      return {
+        vis: '<div class="avis">' + animalsVis(false) + '<span class="carry' + (carry ? ' full' : '') + '">' + carry + '</span></div>',
+        goal: G.carry !== null ? 'Who eats ' + G.pairs[G.carry][4] + '?' : G.fed.size === G.pairs.length ? 'All fed!' : 'Pick up some food'
+      };
+    },
+    intro() { return 'Bring each animal the food it eats.'; },
+    hint() {
+      if (G.carry !== null) { pulseWhere(it => it.kind === 'animal' && it.p === G.carry); msg('Take it to the glowing animal.', 'hint'); return; }
+      pulseWhere(it => it.kind === 'food');
+      msg('Pick up some food first.', 'hint');
+    }
+  };
+  function animalsVis(all) {
+    return '<div class="agrid">' + G.pairs.map((p, j) => '<span class="acell">' + p[0] + (all || G.fed.has(j) ? '<i>❤️</i>' : '') + '</span>').join('') + '</div>';
+  }
+  function showCarry() {
+    B.carry.innerHTML = G.carry === null ? '' : '<circle class="carry-bg" cx="15" cy="-15" r="11"/>' + '<text class="emo" font-size="15" x="15" y="-15" dy=".35em">' + G.pairs[G.carry][2] + '</text>';
+  }
+
+  MODES.spell = {
+    prepare() { const w = G.words[G.round]; G.word = w[0]; G.pic = w[1]; G.k = 0; },
+    size() { return 44 + G.word.length * 7; },
+    need() { return 30; },
+    setup() {
+      const letters = G.word.split('');
+      const pool = (def.lang === 'it' ? 'ABCDEFGILMNOPRSTUVZ' : 'ABCDEFGHIJKLMNOPRSTUVWYZ').split('').filter(ch => !letters.includes(ch));
+      const all = shuffle(letters.concat(shuffle(pool).slice(0, letters.length <= 3 ? 2 : 3)));
+      const cells = spread(all.length, new Set([G.start]));
+      all.forEach((ch, j) => addItem(cells[j], { ch }, letterMarkup(ch)));
+    },
+    enter(i) {
+      const it = G.items.get(i);
+      if (!it) return;
+      const want = G.word[G.k];
+      if (it.ch !== want) { reject(it.inner); say2(L('That’s ' + it.ch + '. We need ' + want + '.', 'Questa è la ' + it.ch + '. Ci serve la ' + want + '.'), 'bad'); return; }
+      collect(it);
+      G.k++;
+      renderHud();
+      if (G.k < G.word.length) { say2(L(want + '! Now find ' + G.word[G.k] + '.', want + '! Ora trova la ' + G.word[G.k] + '.'), 'good'); return; }
+      const vis = '<div class="spell"><span class="pic">' + G.pic + '</span><span class="win-word">' + G.word + '</span></div>';
+      const w = G.words.map(x => x[0]), n = G.round + 1, lw = x => x.toLowerCase();
+      if (G.round < G.words.length - 1) {
+        win({ vis, title: L('You spelled ', 'Hai scritto ') + G.word + '!', text: L('Word ' + n + ' of 3 done.', 'Parola ' + n + ' di 3: fatta!'),
+          spoken: L('You spelled ', 'Hai scritto ') + lw(G.word) + '!', main: L('Next word', 'Parola successiva'), partial: true, action: () => { G.round++; newMaze(); } });
+      } else {
+        win({ vis, title: L('Super speller!', 'Che bravura!'), text: L('You spelled ' + w[0] + ', ' + w[1] + ' and ' + w[2] + '.', 'Hai scritto ' + w[0] + ', ' + w[1] + ' e ' + w[2] + '.'),
+          spoken: L('Super speller! You spelled ' + lw(w[0]) + ', ' + lw(w[1]) + ' and ' + lw(w[2]) + '.', 'Che bravura! Hai scritto ' + lw(w[0]) + ', ' + lw(w[1]) + ' e ' + lw(w[2]) + '.'),
+          main: L('Three new words', 'Tre parole nuove'), action: () => startGame(def.id) });
+      }
+    },
+    hud() {
+      const slots = G.word.split('').map((ch, j) => '<span class="sl' + (j < G.k ? ' got' : '') + '">' + ch + '</span>').join('');
+      const fin = G.k >= G.word.length;
+      return { vis: '<div class="spell"><span class="pic">' + G.pic + '</span><span class="slots">' + slots + '</span></div>',
+        goal: fin ? G.word + '!' : L('Spell ', 'Scrivi ') + G.word, spoken: fin ? G.word.toLowerCase() + '!' : L('Spell ', 'Scrivi ') + G.word.toLowerCase() };
+    },
+    intro() { return L('Word ' + (G.round + 1) + ' of 3. Pick up the letters in order.', 'Parola ' + (G.round + 1) + ' di 3. Raccogli le lettere in ordine.'); },
+    hint() { const want = G.word[G.k]; pulseWhere(it => it.ch === want); msg(L('Look for the glowing ' + want + '!', 'Cerca la ' + want + ' che brilla!'), 'hint'); }
+  };
+
+  /* ---------- finishing ---------- */
+  let winAction = null;
+  function win(info) {
+    G.live = false;
+    stopWalking();
+    clearHint();
+    if (!info.partial) { done[def.id] = (done[def.id] || 0) + 1; store.set('mz.done', done); }
+    sfx.win();
+    confetti();
+    E.winVis.innerHTML = info.vis || '';
+    E.winTitle.textContent = info.title;
+    E.winText.textContent = info.text;
+    E.winMain.textContent = info.main || 'New maze';
+    winAction = info.action || newMaze;
+    setTimeout(() => {
+      E.win.hidden = false;
+      try { E.winMain.focus({ preventScroll: true }); } catch (e) { E.winMain.focus(); }
+    }, 380);
+    speakIf(info.spoken || info.title + ' ' + info.text);
+  }
+  E.winMain.addEventListener('click', () => { E.win.hidden = true; if (winAction) winAction(); });
+
+  const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function confetti() {
+    if (reduceMotion) return;
+    const boxEl = document.createElement('div');
+    boxEl.className = 'confetti';
+    boxEl.setAttribute('aria-hidden', 'true');
+    const colors = RAINBOW.map(c => c[1]).concat(['#ff5fa2', '#ffffff']);
+    let html = '';
+    for (let i = 0; i < 56; i++) {
+      html += '<i style="--x:' + ((Math.random() * 2 - 1) * 46).toFixed(1) + 'vw;--y1:' + (-(12 + Math.random() * 28)).toFixed(1) + 'vh;--y2:' + (30 + Math.random() * 40).toFixed(1) +
+        'vh;--rot:' + Math.round((Math.random() * 2 - 1) * 720) + 'deg;--c:' + pick(colors) + ';width:' + (6 + rand(7)) + 'px;height:' + (8 + rand(9)) + 'px;animation-delay:' + rand(120) + 'ms"></i>';
+    }
+    boxEl.innerHTML = html;
+    document.body.appendChild(boxEl);
+    setTimeout(() => boxEl.remove(), 1900);
+  }
+
+  /* ---------- home ---------- */
+  function tileFor(g) {
+    if (g.mode === 'classic') return '<span class="temo">' + g.player + '</span>' + trailDots + '<span class="temo">' + g.goal + '</span>';
+    if (g.mode === 'numbers') return (g.dir > 0 ? [1, 2, 3] : [3, 2, 1]).map(v => '<span class="tnum">' + v + '</span>').join('');
+    if (g.mode === 'dress') return '<svg class="thead" viewBox="34 4 132 132" aria-hidden="true">' + headToken(PEOPLE[g.person]) + '</svg>';
+    if (g.mode === 'rainbow') return rainbowSVG(6);
+    if (g.mode === 'keys') return '<svg class="tkey" viewBox="0 0 40 40" aria-hidden="true">' + keyIcon(KEYC[0][1]) + '</svg>' + trailDots + '<span class="temo">💎</span>';
+    if (g.mode === 'animals') return '<span class="temo">🥕</span>' + trailDots + '<span class="temo">🐰</span>';
+    return (g.lang === 'it' ? ['A', 'P', 'E'] : ['C', 'A', 'T']).map(ch => '<span class="tnum let">' + ch + '</span>').join('');
+  }
+  function descFor(g) {
+    if (g.mode !== 'numbers') return g.desc;
+    return g.dir > 0 ? 'Visit 1, 2, 3 and on up to ' + settings.upTo : 'Start at ' + settings.upTo + ' and count back to 1';
+  }
+  function renderHome() {
+    E.sections.innerHTML = SECTIONS.map((title, s) =>
+      '<section class="sec"><h2>' + title + '</h2><div class="cards">' +
+      GAMES.filter(g => g.sec === s).map(g =>
+        '<button type="button" class="gcard" data-game="' + g.id + '" aria-label="' + g.name + '. ' + descFor(g) + '.' + (done[g.id] ? ' Finished.' : '') + '">' +
+        '<span class="tile dotpaper" aria-hidden="true">' + tileFor(g) + '</span>' +
+        '<span class="gname" aria-hidden="true">' + g.name + '</span><span class="gdesc" aria-hidden="true">' + descFor(g) + '</span>' +
+        (done[g.id] ? '<span class="tick" aria-hidden="true">✓</span>' : '') + '</button>'
+      ).join('') + '</div></section>'
+    ).join('');
+  }
+  function drawHero() {
+    const m = makeMaze(11, 5, 0.06);
+    const p = [0].concat(route(m, 0, m.n - 1, 0) || []);
+    const W = m.cols * CELL + PAD * 2, H = m.rows * CELL + PAD * 2;
+    E.hero.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+    E.hero.innerHTML = '<path class="crayon" pathLength="1" d="M' + p.map(i => cxOf(m, i) + ' ' + cyOf(m, i)).join('L') + '"/>' +
+      '<path class="walls" d="' + wallPath(m) + '"/>' +
+      '<text class="emo" font-size="27" x="' + cxOf(m, 0) + '" y="' + cyOf(m, 0) + '" dy=".35em">🐭</text>' +
+      '<text class="emo" font-size="27" x="' + cxOf(m, m.n - 1) + '" y="' + cyOf(m, m.n - 1) + '" dy=".35em">🧀</text>';
+  }
+
+  /* ---------- settings ---------- */
+  let lastFocus = null, resetArmed = false, resetTimer = 0;
+  function syncSettingsUI() {
+    $$('.switch', E.settings).forEach(b => b.setAttribute('aria-checked', settings[b.dataset.key] ? 'true' : 'false'));
+    $$('[data-upto]', E.settings).forEach(b => b.setAttribute('aria-pressed', String(settings.upTo === Number(b.dataset.upto))));
+    E.voiceRow.hidden = !canSpeak;
+  }
+  function openSettings() {
+    lastFocus = document.activeElement;
+    syncSettingsUI();
+    E.settings.hidden = false;
+    E.closeSettings.focus();
+  }
+  function closeSettings() {
+    E.settings.hidden = true;
+    resetArmed = false;
+    E.reset.textContent = 'Clear ticks';
+    if (current === 'home') renderHome();
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+  E.settings.addEventListener('click', e => {
+    if (e.target === E.settings) { closeSettings(); return; }
+    const sw = e.target.closest('.switch');
+    if (sw) {
+      const k = sw.dataset.key;
+      settings[k] = !settings[k];
+      saveSettings();
+      syncSettingsUI();
+      if (k === 'sound' && settings.sound) sfx.tap();
+      if (k === 'voice' && settings.voice) say('I will read the instructions out loud.');
+      if (k === 'pad') E.pad.hidden = !settings.pad || current !== 'play';
+      if (k === 'trail') E.board.classList.toggle('no-trail', !settings.trail);
+      return;
+    }
+    const u = e.target.closest('[data-upto]');
+    if (u) { settings.upTo = Number(u.dataset.upto); saveSettings(); syncSettingsUI(); }
+  });
+  E.reset.addEventListener('click', () => {
+    if (!resetArmed) {
+      resetArmed = true;
+      E.reset.textContent = 'Tap again to clear';
+      clearTimeout(resetTimer);
+      resetTimer = setTimeout(() => { resetArmed = false; E.reset.textContent = 'Clear ticks'; }, 3000);
+      return;
+    }
+    resetArmed = false;
+    done = {};
+    store.set('mz.done', done);
+    E.reset.textContent = 'Ticks cleared';
+  });
+  E.closeSettings.addEventListener('click', closeSettings);
+
+  /* ---------- wiring ---------- */
+  document.addEventListener('click', e => {
+    const go2 = e.target.closest('[data-go]');
+    if (go2) { sfx.tap(); show(go2.dataset.go); return; }
+    if (e.target.closest('[data-settings]')) { openSettings(); return; }
+    const card = e.target.closest('[data-game]');
+    if (card) { sfx.tap(); startGame(card.dataset.game); }
+  });
+  $('#newBtn').addEventListener('click', () => { sfx.tap(); if (def.mode === 'spell') startGame(def.id); else newMaze(); });
+  $('#hintBtn').addEventListener('click', () => { if (G && G.live) G.mode.hint(); });
+  E.sayBtn.addEventListener('click', () => { if (G) say(G.goalSpoken + '. ' + E.hudMsg.textContent, def.lang); });
+  if (!canSpeak) E.sayBtn.hidden = true;
+
+  drawHero();
+  renderHome();
+
+})();
+</script>
+</body>
+</html>
