@@ -1,0 +1,1076 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Euro Coin Shop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Baloo+2:wght@500;600;700;800&display=swap">
+<style>
+/* ---------- colour tokens ---------- */
+:root{
+  --bg:#e2f3ee;--surface:#ffffff;--surface-2:#eaf6f2;
+  --ink:#15313a;--ink-soft:#4a676d;--line:#bddfd5;
+  --felt:#20705f;--felt-hi:#2c8572;--felt-edge:#154f43;--felt-ink:#e6f8f1;--slot:rgba(230,248,241,.45);--pill:rgba(0,0,0,.2);
+  --sticker:#ffd23f;--sticker-edge:#e0a90b;--sticker-ink:#15313a;
+  --purse:#ffe3e8;--purse-edge:#f0a6b5;--purse-ink:#862a42;--frame:#a9b2bb;--frame-hi:#f2f5f7;
+  --awning:#e5484d;--awning-2:#fff8ee;
+  --pay:#ffc531;--pay-edge:#d09300;--pay-ink:#15313a;
+  --ghost:#ffffff;--ghost-edge:#b3d8cd;
+  --bad:#bd2c35;--bad-bg:#ffe0e2;--good:#10724b;--good-bg:#d2f0e1;--hint:#744d00;--hint-bg:#fff0c2;
+  --star:#ffb703;--star-off:#c6e1d9;--dot:#c2ddd5;--dot-ok:#ff9f1c;
+  --focus:#1d6fe0;--scrim:rgba(10,30,35,.5);
+  --display:"Baloo 2","Arial Rounded MT Bold",ui-rounded,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --text:"Andika","Trebuchet MS",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e2227;--surface:#17333a;--surface-2:#1e3e46;
+    --ink:#e6f5f1;--ink-soft:#9dbdc0;--line:#09171b;
+    --felt:#1c5e51;--felt-hi:#256d5e;--felt-edge:#0f3b33;--felt-ink:#e6f8f1;--slot:rgba(230,248,241,.36);--pill:rgba(0,0,0,.3);
+    --sticker:#ffd23f;--sticker-edge:#c99507;--sticker-ink:#15313a;
+    --purse:#3a2230;--purse-edge:#6d3a51;--purse-ink:#ffc2cf;--frame:#7f8a94;--frame-hi:#d3dae0;
+    --awning:#d9434a;--awning-2:#eadfcf;
+    --pay:#ffc531;--pay-edge:#b07c00;--pay-ink:#15313a;
+    --ghost:#21434c;--ghost-edge:#09171b;
+    --bad:#ff8a8f;--bad-bg:#3f1f27;--good:#6fe2a8;--good-bg:#133b2f;--hint:#ffd670;--hint-bg:#3a3220;
+    --star:#ffc93c;--star-off:#2b4a51;--dot:#2b4a51;--dot-ok:#ff9f1c;
+    --focus:#7fc1ff;--scrim:rgba(0,0,0,.62);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e2227;--surface:#17333a;--surface-2:#1e3e46;
+  --ink:#e6f5f1;--ink-soft:#9dbdc0;--line:#09171b;
+  --felt:#1c5e51;--felt-hi:#256d5e;--felt-edge:#0f3b33;--felt-ink:#e6f8f1;--slot:rgba(230,248,241,.36);--pill:rgba(0,0,0,.3);
+  --sticker:#ffd23f;--sticker-edge:#c99507;--sticker-ink:#15313a;
+  --purse:#3a2230;--purse-edge:#6d3a51;--purse-ink:#ffc2cf;--frame:#7f8a94;--frame-hi:#d3dae0;
+  --awning:#d9434a;--awning-2:#eadfcf;
+  --pay:#ffc531;--pay-edge:#b07c00;--pay-ink:#15313a;
+  --ghost:#21434c;--ghost-edge:#09171b;
+  --bad:#ff8a8f;--bad-bg:#3f1f27;--good:#6fe2a8;--good-bg:#133b2f;--hint:#ffd670;--hint-bg:#3a3220;
+  --star:#ffc93c;--star-off:#2b4a51;--dot:#2b4a51;--dot-ok:#ff9f1c;
+  --focus:#7fc1ff;--scrim:rgba(0,0,0,.62);
+  color-scheme:dark;
+}
+
+/* ---------- base ---------- */
+*,*::before,*::after{box-sizing:border-box}
+html{height:100%;background:var(--bg);scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%;text-size-adjust:100%}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:var(--text);font-size:17px;line-height:1.4;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+[hidden]{display:none!important}
+h1,h2,h3{font-family:var(--display);font-weight:700;line-height:1.1;margin:0}
+#app{height:100%}
+.screen{display:none;height:100%;flex-direction:column}
+.screen.active{display:flex}
+.scroll{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.wrap{width:100%;max-width:640px;margin-left:auto;margin-right:auto;padding-left:16px;padding-right:16px}
+
+/* ---------- coins (drawn at true relative size: --r = diameter / €2 diameter) ---------- */
+.coin{
+  --d:calc(var(--coin-max,64px) * var(--r,1));
+  position:relative;flex:none;display:inline-grid;place-items:center;
+  width:var(--d);height:var(--d);border-radius:50%;
+  background:
+    radial-gradient(circle at 31% 25%,rgba(255,255,255,.7) 0,rgba(255,255,255,0) 33%),
+    radial-gradient(circle at 50% 56%,var(--m-base) 0 50%,var(--m-lo) 100%);
+  box-shadow:
+    inset 0 0 0 calc(var(--d)*.05) var(--m-rim),
+    inset 0 0 0 calc(var(--d)*.064) var(--m-lo),
+    inset 0 0 0 calc(var(--d)*.078) var(--m-hi),
+    0 calc(var(--d)*.035) 0 var(--m-edge),
+    0 calc(var(--d)*.08) calc(var(--d)*.14) rgba(0,0,0,.3);
+  color:var(--m-ink);font-family:var(--display);
+}
+.core{position:absolute;inset:15.5%;border-radius:50%;
+  background:radial-gradient(circle at 32% 26%,rgba(255,255,255,.8) 0,rgba(255,255,255,0) 35%),radial-gradient(circle at 50% 56%,var(--k-base) 0 48%,var(--k-lo) 100%);
+  box-shadow:0 0 0 calc(var(--d)*.016) var(--k-lo),inset 0 0 0 calc(var(--d)*.02) rgba(255,255,255,.35)}
+.coin-label{position:relative;display:flex;flex-direction:column;align-items:center;line-height:.82;text-shadow:0 1px 0 rgba(255,255,255,.55),0 -1px 0 rgba(0,0,0,.14);pointer-events:none}
+.coin-label b{font-size:calc(var(--d)*.42);font-weight:700;letter-spacing:-.02em}
+.coin-label i{font-style:normal;font-size:calc(var(--d)*.115);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-top:calc(var(--d)*.05)}
+.m-one .coin-label,.m-two .coin-label{color:var(--k-ink)}
+.m-one .coin-label b,.m-two .coin-label b{font-size:calc(var(--d)*.36)}
+.m-copper{--m-hi:#ffd9bf;--m-base:#d27b48;--m-lo:#93441c;--m-rim:#bc6533;--m-edge:#6e2d0c;--m-ink:#5a2108}
+.m-gold,.m-one{--m-hi:#fff3c2;--m-base:#e6bd4f;--m-lo:#a67a1b;--m-rim:#d2a63a;--m-edge:#7b560b;--m-ink:#553a04}
+.m-two{--m-hi:#ffffff;--m-base:#d8dce2;--m-lo:#929aa5;--m-rim:#c1c6ce;--m-edge:#6b737e;--m-ink:#353b43}
+.m-one{--k-base:#dadde3;--k-lo:#949ba6;--k-ink:#343a42}
+.m-two{--k-base:#e6bd4f;--k-lo:#a67a1b;--k-ink:#553a04}
+
+/* felt coin tray, used for the counter and coin displays */
+.felt{background:radial-gradient(ellipse at 50% 0%,var(--felt-hi),var(--felt) 70%);border:5px solid var(--felt-edge);border-radius:20px;box-shadow:inset 0 3px 10px rgba(0,0,0,.3);color:var(--felt-ink)}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:18px;padding:12px 14px;font-family:var(--display);font-weight:700;font-size:1.15rem;line-height:1.1;cursor:pointer;white-space:nowrap;transition:transform .08s ease,box-shadow .08s ease,opacity .2s}
+.btn-pay{background:var(--pay);color:var(--pay-ink);box-shadow:0 5px 0 var(--pay-edge)}
+.btn-ghost{background:var(--ghost);color:var(--ink);box-shadow:0 5px 0 var(--ghost-edge)}
+.btn-pay:not(:disabled):active{transform:translateY(4px);box-shadow:0 1px 0 var(--pay-edge)}
+.btn-ghost:not(:disabled):active{transform:translateY(4px);box-shadow:0 1px 0 var(--ghost-edge)}
+.btn:disabled{opacity:.45;cursor:default}
+.btn-wide{width:100%;font-size:1.3rem;padding:15px 20px}
+.icon-btn{flex:none;width:44px;height:44px;display:grid;place-items:center;border:0;border-radius:14px;background:var(--ghost);color:var(--ink);box-shadow:0 4px 0 var(--ghost-edge);font-size:20px;line-height:1;cursor:pointer;transition:transform .08s,box-shadow .08s}
+.icon-btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ghost-edge)}
+.icon-btn svg{width:22px;height:22px}
+
+/* ---------- top bar ---------- */
+.topbar{flex:none;display:flex;align-items:center;gap:10px;width:100%;max-width:640px;margin:0 auto;padding:10px 14px 6px}
+.bar-title{flex:1;min-width:0;font-family:var(--display);font-weight:700;font-size:1.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dots{flex:none;display:flex;gap:5px}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--dot);transition:background .3s}
+.dot.cur{background:var(--surface);box-shadow:0 0 0 3px var(--ink)}
+.dot.ok{background:var(--dot-ok)}
+.dot.perfect{background:var(--good)}
+
+/* ---------- home ---------- */
+.awning{position:relative;flex:none;height:40px;background:repeating-linear-gradient(90deg,var(--awning) 0 36px,var(--awning-2) 36px 72px);box-shadow:inset 0 -12px 14px -12px rgba(0,0,0,.2)}
+.awning::after{content:"";position:absolute;left:0;right:0;top:100%;height:18px;background:radial-gradient(circle at 18px 0,var(--awning) 17.5px,transparent 18px) 0 0/72px 18px repeat-x,radial-gradient(circle at 54px 0,var(--awning-2) 17.5px,transparent 18px) 0 0/72px 18px repeat-x;filter:drop-shadow(0 3px 2px rgba(0,0,0,.12))}
+.home{padding-top:34px;padding-bottom:28px}
+.home-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.brand-coins{--coin-max:44px;display:flex;align-items:flex-end;margin-bottom:14px}
+.brand-coins .coin{margin-right:-7px;transform:rotate(var(--rot,0deg))}
+.brand h1{font-size:clamp(36px,10vw,52px);font-weight:800;letter-spacing:-.01em}
+.sub{margin:6px 0 0;color:var(--ink-soft);font-size:1.05rem;max-width:34ch}
+.meet{margin-top:22px;width:100%;display:flex;align-items:center;gap:14px;border:0;border-radius:22px;padding:10px 16px 10px 10px;background:var(--surface);box-shadow:0 5px 0 var(--line);text-align:left;cursor:pointer;transition:transform .08s,box-shadow .08s}
+.meet:active{transform:translateY(3px);box-shadow:0 2px 0 var(--line)}
+.meet-tile{--coin-max:34px;flex:none;width:92px;height:66px;display:flex;align-items:center;justify-content:center;gap:3px;border-width:4px;border-radius:14px}
+.meet-text{flex:1;min-width:0;display:flex;flex-direction:column}
+.meet-text b{font-family:var(--display);font-size:1.3rem;font-weight:700;line-height:1.15}
+.meet-text small{font-size:.95rem;color:var(--ink-soft)}
+.chev{flex:none;width:22px;height:22px;color:var(--ink-soft)}
+.section-title{margin:28px 4px 12px;font-size:1.35rem}
+.levels{display:grid;gap:12px}
+@media (min-width:600px){.levels{grid-template-columns:1fr 1fr}}
+.level{display:flex;align-items:center;gap:14px;width:100%;border:0;border-radius:20px;padding:12px 14px 12px 12px;background:var(--surface);box-shadow:0 5px 0 var(--line);text-align:left;cursor:pointer;transition:transform .08s,box-shadow .08s}
+.level:active{transform:translateY(3px);box-shadow:0 2px 0 var(--line)}
+.lv-tile{position:relative;flex:none;width:60px;height:60px;border-radius:16px;background:var(--surface-2);display:grid;place-items:center;font-size:34px;line-height:1}
+.lv-num{position:absolute;right:-6px;top:-6px;width:26px;height:26px;border-radius:50%;background:var(--sticker);color:var(--sticker-ink);font-family:var(--display);font-weight:800;font-size:15px;line-height:1;display:grid;place-items:center;box-shadow:0 2px 0 var(--sticker-edge)}
+.lv-text{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.lv-name{font-family:var(--display);font-weight:700;font-size:1.28rem;line-height:1.15}
+.lv-desc{font-size:.95rem;color:var(--ink-soft);line-height:1.3}
+.lv-stars{flex:none;display:flex;font-size:21px;line-height:1;color:var(--star-off)}
+.lv-stars .on{color:var(--star)}
+.foot{margin:22px 0 0;text-align:center;color:var(--ink-soft);font-size:.9rem}
+
+/* ---------- meet the coins ---------- */
+.learn{padding-top:8px;padding-bottom:28px;display:grid;gap:16px}
+.learn-card{background:var(--surface);border-radius:22px;padding:14px;box-shadow:0 5px 0 var(--line)}
+.learn-card h3{font-size:1.35rem}
+.learn-card p{margin:4px 2px 12px;color:var(--ink-soft)}
+.learn-card p.after{margin:12px 2px 0}
+.learn-row{--coin-max:clamp(64px,21vw,108px);display:flex;justify-content:center;align-items:flex-end;flex-wrap:wrap;gap:6px 10px;padding:16px 6px 10px}
+.learn-coin{display:flex;flex-direction:column;align-items:center;gap:8px;border:0;background:none;padding:4px;border-radius:14px;cursor:pointer;color:var(--felt-ink);perspective:500px}
+.learn-coin .name{font-family:var(--display);font-weight:600;font-size:1.08rem}
+.learn-coin.spin .coin{animation:spin .7s ease-in-out}
+.equation{--coin-max:60px;display:flex;align-items:center;justify-content:center;gap:10px;padding:14px 8px;font-family:var(--display);font-size:1.8rem;font-weight:700}
+
+/* ---------- play ---------- */
+.stage{display:flex;flex-direction:column;gap:7px;width:100%;max-width:640px;margin:0 auto;padding:2px 14px 8px}
+.stage>*{margin-top:auto;margin-bottom:auto;flex:none}
+.price-card{display:flex;align-items:center;justify-content:center;gap:14px;padding-top:4px}
+.item{font-size:clamp(52px,10vh,92px);line-height:1;filter:drop-shadow(0 6px 6px rgba(0,0,0,.18))}
+.tag{position:relative;min-width:0;background:var(--sticker);color:var(--sticker-ink);border-radius:18px;padding:8px 12px 8px 34px;box-shadow:0 5px 0 var(--sticker-edge);transform:rotate(-2.5deg)}
+.tag::before{content:"";position:absolute;left:11px;top:50%;width:13px;height:13px;margin-top:-6.5px;border-radius:50%;background:var(--bg);box-shadow:inset 0 2px 2px rgba(0,0,0,.2)}
+.price-row{display:flex;align-items:center;gap:10px}
+.price{font-family:var(--display);font-size:clamp(34px,min(7.5vh,12vw),62px);font-weight:800;line-height:1;white-space:nowrap;padding-top:.08em}
+.speak{flex:none;width:40px;height:40px;display:grid;place-items:center;border:0;border-radius:50%;background:rgba(255,255,255,.6);font-size:18px;cursor:pointer}
+.price-words{margin-top:2px;font-size:clamp(.85rem,3.9vw,1rem);font-weight:700;white-space:nowrap}
+.task{margin:0;text-align:center;font-size:1.08rem;text-wrap:balance}
+.counter{padding:8px 10px 12px}
+.counter-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 4px 8px;font-family:var(--display);font-weight:600;font-size:1.02rem}
+.total{background:var(--pill);padding:1px 12px;border-radius:99px;font-variant-numeric:tabular-nums}
+.slots{--coin-max:clamp(46px,min(15vw,8.5vh),70px);--cols:4;display:grid;grid-template-columns:repeat(var(--cols),auto);justify-content:center;gap:10px}
+.slots[data-cap="1"]{--cols:1}
+.slots[data-cap="2"]{--cols:2}
+.slots[data-cap="3"]{--cols:3}
+.slots[data-cap="5"]{--cols:5;--coin-max:clamp(34px,calc((min(100vw,640px) - 130px) / 5),62px);gap:8px}
+.slots[data-cap="6"]{--cols:6;--coin-max:clamp(30px,calc((min(100vw,640px) - 136px) / 6),58px);gap:6px}
+.slot{width:calc(var(--coin-max) + 8px);height:calc(var(--coin-max) + 8px);display:grid;place-items:center;padding:0;border-radius:50%;border:3px dashed var(--slot);background:none}
+.slot.filled{border-color:transparent;cursor:pointer}
+.feedback{min-height:2.9em;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:700;font-size:1.03rem;line-height:1.25;border-radius:16px;padding:6px 12px;color:var(--ink-soft)}
+.feedback.bad{background:var(--bad-bg);color:var(--bad)}
+.feedback.good{background:var(--good-bg);color:var(--good)}
+.feedback.hint{background:var(--hint-bg);color:var(--hint)}
+.purse-wrap{padding-top:18px}
+.purse{position:relative;background:var(--purse);border:3px solid var(--purse-edge);border-radius:16px 16px 30px 30px;padding:14px 8px 12px}
+.purse::before{content:"";position:absolute;left:14%;right:14%;top:-9px;height:11px;border-radius:8px;background:linear-gradient(var(--frame-hi),var(--frame));box-shadow:0 2px 0 rgba(0,0,0,.12)}
+.purse::after{content:"";position:absolute;left:50%;top:-19px;width:30px;height:16px;margin-left:-15px;background:radial-gradient(circle at 8px 9px,var(--frame-hi) 0 2.5px,var(--frame) 4px 6.5px,transparent 7px),radial-gradient(circle at 22px 9px,var(--frame-hi) 0 2.5px,var(--frame) 4px 6.5px,transparent 7px)}
+.purse-grid{--coin-max:clamp(52px,min(19vw,10.5vh),92px);display:grid;grid-template-columns:repeat(4,1fr);gap:8px 4px;place-items:center}
+.coin-btn{position:relative;display:grid;place-items:center;padding:0;border:0;border-radius:50%;background:none;cursor:pointer;transition:transform .12s}
+.coin-btn:not(:disabled):active{transform:scale(.9)}
+@media (hover:hover){.coin-btn:not(:disabled):hover{transform:translateY(-3px) rotate(-5deg)}}
+.coin-btn:disabled{cursor:not-allowed}
+.coin-btn:disabled .coin{filter:grayscale(1);opacity:.35}
+.coin-btn:disabled::after{content:"";position:absolute;left:4%;right:4%;top:50%;height:5px;margin-top:-2.5px;border-radius:3px;background:var(--bad);transform:rotate(-35deg)}
+.actions{flex:none;display:grid;grid-template-columns:1fr 1fr 1.45fr;gap:10px;width:100%;max-width:640px;margin:0 auto;padding:8px 14px 14px}
+.actions .btn-pay{font-size:1.35rem}
+@supports (height:1svh){
+  .item{font-size:clamp(52px,10svh,92px)}
+  .price{font-size:clamp(34px,min(7.5svh,12vw),62px)}
+  .slots{--coin-max:clamp(46px,min(15vw,8.5svh),70px)}
+  .purse-grid{--coin-max:clamp(52px,min(19vw,10.5svh),92px)}
+}
+
+@media (max-height:620px){
+  .topbar{padding-top:6px;padding-bottom:2px}
+  .icon-btn{width:40px;height:40px;border-radius:12px}
+  .stage{gap:5px}
+  .item{font-size:44px}
+  .price{font-size:34px}
+  .tag{padding:6px 10px 6px 30px}
+  .tag::before{left:10px}
+  .speak{width:34px;height:34px;font-size:16px}
+  .task{font-size:.98rem}
+  .counter{padding:6px 8px 8px}
+  .counter-head{margin-bottom:4px;font-size:.92rem}
+  .feedback{min-height:2.5em;font-size:.95rem;padding:4px 10px}
+  .purse-wrap{padding-top:14px}
+  .purse{padding:8px 6px}
+  .actions{padding-top:6px;padding-bottom:10px}
+  .actions .btn{padding:10px 12px}
+}
+
+/* ---------- overlays ---------- */
+.overlay{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:calc(16px + env(safe-area-inset-top,0px)) 16px calc(16px + env(safe-area-inset-bottom,0px));background:var(--scrim);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+.card{width:100%;max-width:420px;max-height:100%;overflow:auto;background:var(--surface);border-radius:28px;padding:22px 20px 20px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.3);animation:rise .38s cubic-bezier(.2,1.3,.4,1)}
+.win-emoji{font-size:74px;line-height:1;animation:bounce .7s cubic-bezier(.3,1.6,.5,1)}
+.card h2{margin:8px 0 2px;font-size:2rem}
+.win-text{margin:0 0 14px;color:var(--ink-soft);font-size:1.1rem}
+.win-coins{--coin-max:46px;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px;padding:10px;margin-bottom:14px;border-width:4px;border-radius:16px}
+.op{font-family:var(--display);font-weight:700;font-size:1.3rem;opacity:.85}
+.sum{font-family:var(--display);font-weight:800;font-size:1.45rem}
+.win-tip{margin:0 0 16px;padding:10px;border-radius:16px;background:var(--hint-bg);color:var(--hint);font-weight:700;display:flex;flex-direction:column;align-items:center;gap:8px}
+.tip-coins{--coin-max:38px;display:flex;align-items:center;gap:4px}
+.sheet{text-align:left}
+.sheet h2{text-align:center;margin:0 0 4px;font-size:1.6rem}
+.set-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:2px solid var(--surface-2);font-weight:700}
+.set-row.stack{flex-direction:column;align-items:stretch;gap:8px}
+.switch{flex:none;position:relative;width:54px;height:32px;border:0;border-radius:99px;background:var(--star-off);cursor:pointer;transition:background .2s}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .2s}
+.switch[aria-checked="true"]{background:var(--good)}
+.switch[aria-checked="true"]::after{transform:translateX(22px)}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;border-radius:14px;background:var(--surface-2)}
+.seg button{border:0;background:none;padding:8px 6px;border-radius:10px;cursor:pointer;font-family:var(--display);font-weight:600;font-size:1.05rem}
+.seg button[aria-pressed="true"]{background:var(--surface);box-shadow:0 2px 0 var(--line)}
+.set-note{margin:14px 0;color:var(--ink-soft);font-size:.95rem}
+.set-actions{display:flex;gap:10px}
+.set-actions .btn{flex:1;font-size:1.05rem;padding:12px}
+
+/* ---------- level complete ---------- */
+.done{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding-top:24px;padding-bottom:24px;text-align:center}
+.done-emoji{font-size:88px;line-height:1;animation:bounce .8s cubic-bezier(.3,1.6,.5,1)}
+.done-title{margin-top:6px;font-size:2.1rem}
+.stars{display:flex;gap:6px;margin:6px 0;font-size:58px;line-height:1}
+.star{color:var(--star-off)}
+.star.on{color:var(--star);animation:starpop .55s cubic-bezier(.2,1.6,.4,1) both;animation-delay:calc(var(--i) * .22s)}
+.done-text{margin:0 0 16px;max-width:30ch;color:var(--ink-soft);font-size:1.12rem;text-wrap:balance}
+.done-actions{display:grid;gap:14px;width:100%;max-width:340px}
+
+/* ---------- motion ---------- */
+.slot.pop .coin{animation:pop .38s cubic-bezier(.2,1.5,.4,1)}
+.shake{animation:shake .42s}
+.bounce{animation:bounce .55s cubic-bezier(.3,1.6,.5,1)}
+.wiggle{animation:wiggle .5s ease-in-out 3}
+.glow{outline:4px solid var(--star)!important;outline-offset:4px;animation:glow 1s ease-in-out 3}
+.confetti{position:fixed;inset:0;z-index:60;pointer-events:none;overflow:hidden}
+.confetti i{position:absolute;left:50%;top:42%;border-radius:3px;background:var(--c);animation:fly 1.5s cubic-bezier(.15,.7,.35,1) both}
+@keyframes pop{0%{transform:translateY(-44px) scale(.4);opacity:0}100%{transform:none;opacity:1}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(3px)}}
+@keyframes bounce{0%{transform:scale(.5) rotate(-10deg);opacity:.2}100%{transform:none;opacity:1}}
+@keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-12deg)}75%{transform:rotate(12deg)}}
+@keyframes glow{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+@keyframes rise{from{transform:translateY(30px) scale(.94);opacity:0}to{transform:none;opacity:1}}
+@keyframes spin{from{transform:rotateY(0)}to{transform:rotateY(360deg)}}
+@keyframes starpop{from{transform:scale(0) rotate(-40deg);opacity:0}to{transform:none;opacity:1}}
+@keyframes fly{0%{transform:translate(-50%,-50%) rotate(0);opacity:1}40%{transform:translate(calc(-50% + var(--x) * .7),calc(-50% + var(--y1))) rotate(calc(var(--rot) * .5));opacity:1}100%{transform:translate(calc(-50% + var(--x)),calc(-50% + var(--y2))) rotate(var(--rot));opacity:0}}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- HOME -->
+  <section class="screen active" id="home" aria-label="Pick a level">
+    <div class="scroll">
+      <div class="awning" aria-hidden="true"></div>
+      <div class="wrap home">
+        <header class="home-head">
+          <div class="brand">
+            <div class="brand-coins" id="brandCoins" aria-hidden="true"></div>
+            <h1>Euro Coin Shop</h1>
+            <p class="sub">Buy things in the shop by paying with exactly the right coins.</p>
+          </div>
+          <button type="button" class="icon-btn" data-settings aria-label="Settings for grown-ups">⚙️</button>
+        </header>
+
+        <button type="button" class="meet" id="meetBtn">
+          <span class="meet-tile felt" id="meetTile" aria-hidden="true"></span>
+          <span class="meet-text"><b>Meet the coins</b><small>See all 8 coins and hear their names</small></span>
+          <svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+
+        <h2 class="section-title">Pick a level</h2>
+        <div class="levels" id="levels"></div>
+        <p class="foot">Stars are saved on this device.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- MEET THE COINS -->
+  <section class="screen" id="learn" aria-label="Meet the coins">
+    <header class="topbar">
+      <button type="button" class="icon-btn" data-go="home" aria-label="Back to levels"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="bar-title">Meet the coins</div>
+    </header>
+    <div class="scroll">
+      <div class="wrap learn" id="learnBody"></div>
+    </div>
+  </section>
+
+  <!-- PLAY -->
+  <section class="screen" id="play" aria-label="Shop">
+    <header class="topbar">
+      <button type="button" class="icon-btn" data-go="home" aria-label="Back to levels"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="bar-title"><span id="lvlEmoji" aria-hidden="true"></span> <span id="lvlName"></span></div>
+      <div class="dots" id="dots" role="img"></div>
+      <button type="button" class="icon-btn" data-settings aria-label="Settings for grown-ups">⚙️</button>
+    </header>
+    <div class="scroll stage">
+      <div class="price-card">
+        <div class="item" id="itemEmoji" aria-hidden="true"></div>
+        <div class="tag">
+          <div class="price-row">
+            <span class="price" id="price"></span>
+            <button type="button" class="speak" id="speakBtn" aria-label="Hear the price">🔊</button>
+          </div>
+          <div class="price-words" id="priceWords"></div>
+        </div>
+      </div>
+      <p class="task" id="task"></p>
+      <div class="counter felt" id="counter">
+        <div class="counter-head"><span>On the counter</span><span class="total" id="total"></span></div>
+        <div class="slots" id="slots"></div>
+      </div>
+      <div class="feedback" id="feedback" role="status" aria-live="polite"></div>
+      <div class="purse-wrap">
+        <div class="purse">
+          <div class="purse-grid" id="purse"></div>
+        </div>
+      </div>
+    </div>
+    <footer class="actions">
+      <button type="button" class="btn btn-ghost" id="clearBtn">Clear</button>
+      <button type="button" class="btn btn-ghost" id="hintBtn">💡 Hint</button>
+      <button type="button" class="btn btn-pay" id="payBtn">Pay</button>
+    </footer>
+  </section>
+
+  <!-- LEVEL COMPLETE -->
+  <section class="screen" id="done" aria-label="Level complete">
+    <div class="scroll">
+      <div class="wrap done">
+        <div class="done-emoji" id="doneEmoji" aria-hidden="true"></div>
+        <h2 class="done-title" id="doneTitle"></h2>
+        <div class="stars" id="doneStars" role="img"></div>
+        <p class="done-text" id="doneText"></p>
+        <div class="done-actions">
+          <button type="button" class="btn btn-pay btn-wide" id="nextLevelBtn">Next level</button>
+          <button type="button" class="btn btn-ghost btn-wide" id="againBtn">Play again</button>
+          <button type="button" class="btn btn-ghost btn-wide" data-go="home">All levels</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- PAID! -->
+<div class="overlay" id="win" hidden>
+  <div class="card" role="dialog" aria-modal="true" aria-labelledby="winTitle">
+    <div class="win-emoji" id="winEmoji" aria-hidden="true"></div>
+    <h2 id="winTitle"></h2>
+    <p class="win-text" id="winText"></p>
+    <div class="win-coins felt" id="winCoins"></div>
+    <p class="win-tip" id="winTip" hidden></p>
+    <button type="button" class="btn btn-pay btn-wide" id="nextBtn">Next</button>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div class="overlay" id="settings" hidden>
+  <div class="card sheet" role="dialog" aria-modal="true" aria-labelledby="setTitle">
+    <h2 id="setTitle">For grown-ups</h2>
+    <div class="set-row"><span>Sound effects</span><button type="button" class="switch" role="switch" data-key="sound" aria-label="Sound effects"></button></div>
+    <div class="set-row" id="voiceRow"><span>Read each price aloud</span><button type="button" class="switch" role="switch" data-key="voice" aria-label="Read each price aloud"></button></div>
+    <div class="set-row"><span>Show the total on the counter</span><button type="button" class="switch" role="switch" data-key="total" aria-label="Show the total on the counter"></button></div>
+    <div class="set-row stack"><span>How prices are written</span>
+      <div class="seg"><button type="button" data-fmt="en">€2.75 and 75c</button><button type="button" data-fmt="eu">2,75 € and 0,75 €</button></div>
+    </div>
+    <p class="set-note">Coins are drawn at their real sizes compared with each other. Levels 1 to 4 use prices under €1 or whole euros. Level 5 mixes euros and cents. Level 6 takes some coins out of the purse, so your child has to find another way to pay. Turn the total off when they’re ready to add up in their head.</p>
+    <div class="set-actions">
+      <button type="button" class="btn btn-ghost" id="resetBtn">Reset stars</button>
+      <button type="button" class="btn btn-pay" id="closeSettings">Done</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  const $ = (s, root) => (root || document).querySelector(s);
+  const $$ = (s, root) => Array.from((root || document).querySelectorAll(s));
+
+  /* ---------- the eight euro coins: value in cents, real diameter in mm ---------- */
+  const COINS = [1, 2, 5, 10, 20, 50, 100, 200];
+  const DIAM = { 1: 16.25, 2: 18.75, 5: 21.25, 10: 19.75, 20: 22.25, 50: 24.25, 100: 23.25, 200: 25.75 };
+  const METAL = { 1: 'copper', 2: 'copper', 5: 'copper', 10: 'gold', 20: 'gold', 50: 'gold', 100: 'one', 200: 'two' };
+  const ROUNDS = 5;
+
+  /* ---------- stars and settings stay on this device ---------- */
+  const store = {
+    get(key, fallback) {
+      try { const v = JSON.parse(localStorage.getItem(key)); return v && typeof v === 'object' ? v : fallback; }
+      catch (e) { return fallback; }
+    },
+    set(key, value) {
+      try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) { /* no storage: the game still works */ }
+    }
+  };
+  const settings = Object.assign({ sound: true, voice: false, total: true, fmt: 'en' }, store.get('ecs.settings', {}));
+  let stars = store.get('ecs.stars', {});
+  const saveSettings = () => store.set('ecs.settings', settings);
+
+  /* ---------- helpers ---------- */
+  const rand = n => Math.floor(Math.random() * n);
+  const randInt = (a, b) => a + rand(b - a + 1);
+  const pick = arr => arr[rand(arr.length)];
+  const shuffle = arr => { for (let i = arr.length - 1; i > 0; i--) { const j = rand(i + 1); const t = arr[i]; arr[i] = arr[j]; arr[j] = t; } return arr; };
+  const range = (a, b) => { const out = []; for (let i = a; i <= b; i++) out.push(i); return out; };
+  const pad2 = n => (n < 10 ? '0' : '') + n;
+
+  function fmt(cents) {
+    const e = Math.floor(cents / 100), c = cents % 100;
+    if (settings.fmt === 'eu') return (c === 0 && e > 0 ? String(e) : e + ',' + pad2(c)) + '\u00a0€';
+    if (cents < 100) return cents + 'c';
+    return '€' + e + (c ? '.' + pad2(c) : '');
+  }
+  function words(cents) {
+    const e = Math.floor(cents / 100), c = cents % 100;
+    const cw = c + (c === 1 ? ' cent' : ' cents');
+    const ew = e + (e === 1 ? ' euro' : ' euros');
+    if (!e) return cw;
+    if (!c) return ew;
+    return ew + ' and ' + cw;
+  }
+  const coinWord = v => (v < 100 ? v + ' cent' : v / 100 + ' euro');
+
+  /* ---------- fewest coins that make an amount ---------- */
+  function bestCombo(amount, avail) {
+    if (amount < 0) return null;
+    if (amount === 0) return [];
+    const dp = new Array(amount + 1).fill(Infinity);
+    const from = new Array(amount + 1).fill(0);
+    dp[0] = 0;
+    for (let a = 1; a <= amount; a++) {
+      for (const c of avail) {
+        if (c <= a && dp[a - c] + 1 < dp[a]) { dp[a] = dp[a - c] + 1; from[a] = c; }
+      }
+    }
+    if (dp[amount] === Infinity) return null;
+    const out = [];
+    for (let a = amount; a > 0; a -= from[a]) out.push(from[a]);
+    return out.sort((x, y) => y - x);
+  }
+  const MIN = (() => {
+    const dp = [0];
+    for (let a = 1; a <= 1000; a++) {
+      let m = Infinity;
+      for (const c of COINS) if (c <= a && dp[a - c] + 1 < m) m = dp[a - c] + 1;
+      dp.push(m);
+    }
+    return dp;
+  })();
+
+  /* ---------- picking prices ---------- */
+  function weightedSample(pool, n, weight) {
+    const items = pool.map(a => ({ a, w: weight(a) })).filter(x => x.w > 0);
+    const out = [];
+    while (out.length < n && items.length) {
+      let r = Math.random() * items.reduce((s, x) => s + x.w, 0);
+      let i = 0;
+      while (i < items.length - 1 && (r -= items[i].w) > 0) i++;
+      out.push(items.splice(i, 1)[0].a);
+    }
+    return out;
+  }
+  const fromPool = (pool, weight) => weightedSample(pool, ROUNDS, weight).map(t => ({ target: t, missing: [] }));
+  const roundish = (a, k) => (a % 5 === 0 ? k : 1); // shop prices ending in 0 or 5 come up more often
+
+  function makeMaster() {
+    const rounds = [], used = new Set();
+    for (let guard = 0; rounds.length < ROUNDS && guard < 5000; guard++) {
+      const missing = shuffle(COINS.slice()).slice(0, Math.random() < 0.6 ? 1 : 2).sort((a, b) => a - b);
+      const avail = COINS.filter(c => !missing.includes(c));
+      const t = Math.random() < 0.8 ? 5 * randInt(1, 80) : randInt(3, 400);
+      if (used.has(t)) continue;
+      const combo = bestCombo(t, avail);
+      // the missing coin must matter, and a way to pay must fit in 6 coins
+      if (!combo || combo.length < 3 || combo.length > 6 || combo.length <= MIN[t]) continue;
+      used.add(t);
+      rounds.push({ target: t, missing });
+    }
+    while (rounds.length < ROUNDS) rounds.push({ target: 40, missing: [20] });
+    return rounds;
+  }
+
+  const LEVELS = [
+    { id: 1, emoji: '🐣', name: 'First coins', desc: 'Find the one right coin', cap: 1,
+      make: () => shuffle(COINS.slice()).slice(0, ROUNDS).map(t => ({ target: t, missing: [] })) },
+    { id: 2, emoji: '🐥', name: 'Easy', desc: 'Pay with up to 2 coins', cap: 2,
+      make: () => fromPool(range(1, 99).filter(a => MIN[a] <= 2).concat([100, 200, 300, 400]),
+        a => roundish(a, 3) * (MIN[a] === 2 ? 1 : 0.35)) },
+    { id: 3, emoji: '🐰', name: 'Medium', desc: 'Pay with up to 3 coins', cap: 3,
+      make: () => fromPool(range(1, 99).filter(a => MIN[a] === 2 || MIN[a] === 3).concat([500, 600]),
+        a => roundish(a, 3) * (MIN[a] === 3 ? 1 : 0.35)) },
+    { id: 4, emoji: '🦊', name: 'Hard', desc: 'Pay with up to 4 coins', cap: 4,
+      make: () => fromPool(range(1, 99).filter(a => MIN[a] === 3 || MIN[a] === 4).concat([700, 800]),
+        a => roundish(a, 3) * (MIN[a] === 4 ? 1 : 0.35)) },
+    { id: 5, emoji: '🦁', name: 'Big prices', desc: 'Euros and cents, up to 5 coins', cap: 5,
+      make: () => fromPool(range(101, 499).filter(a => a % 100 !== 0 && MIN[a] >= 2 && MIN[a] <= 5),
+        a => roundish(a, 5) * (MIN[a] === 2 ? 0.3 : 1)) },
+    { id: 6, emoji: '🐉', name: 'Master', desc: 'Some coins are missing!', cap: 6, make: makeMaster }
+  ];
+
+  /* ---------- things to buy ---------- */
+  const ITEMS = {
+    tiny: [['🍭', 'lollipop'], ['🍓', 'strawberry'], ['✏️', 'pencil'], ['🖍️', 'crayon'], ['🎈', 'balloon'], ['🥚', 'egg'], ['📎', 'paper clip'], ['🌼', 'flower']],
+    small: [['🍎', 'apple'], ['🍌', 'banana'], ['🍐', 'pear'], ['🍊', 'orange'], ['🥕', 'carrot'], ['🍪', 'cookie'], ['🥐', 'croissant'], ['🧁', 'cupcake'],
+      ['🍩', 'doughnut'], ['🥨', 'pretzel'], ['🧃', 'juice box'], ['🍦', 'ice cream'], ['🍋', 'lemon'], ['🥒', 'cucumber']],
+    big: [['🧸', 'teddy bear'], ['🚗', 'toy car'], ['⚽', 'ball'], ['📒', 'notebook'], ['🧩', 'puzzle'], ['🥁', 'toy drum'], ['🎨', 'paint set'],
+      ['🍕', 'pizza'], ['🦖', 'toy dinosaur'], ['📕', 'book'], ['🚂', 'toy train'], ['🎁', 'present'], ['🍉', 'watermelon']]
+  };
+  function withItems(rounds) {
+    const used = new Set();
+    return rounds.map(r => {
+      const tier = r.target < 20 ? ITEMS.tiny : r.target < 100 ? ITEMS.small : ITEMS.big;
+      const fresh = tier.filter(it => !used.has(it[1]));
+      const item = pick(fresh.length ? fresh : tier);
+      used.add(item[1]);
+      return Object.assign({}, r, { item });
+    });
+  }
+
+  /* ---------- sound effects (made in the browser, no files) ---------- */
+  let actx = null, master = null;
+  function audio() {
+    if (!settings.sound) return null;
+    try {
+      if (!actx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return null;
+        actx = new AC();
+        master = actx.createGain();
+        master.gain.value = 0.5;
+        master.connect(actx.destination);
+      }
+      if (actx.state === 'suspended') actx.resume();
+      return actx;
+    } catch (e) { return null; }
+  }
+  function tone(freq, at, dur, type, vol) {
+    const c = audio();
+    if (!c) return;
+    try {
+      const t = c.currentTime + (at || 0);
+      const o = c.createOscillator(), g = c.createGain();
+      o.type = type || 'sine';
+      o.frequency.setValueAtTime(freq, t);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(vol || 0.2, t + 0.012);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(g);
+      g.connect(master);
+      o.start(t);
+      o.stop(t + dur + 0.03);
+    } catch (e) { /* ignore audio hiccups */ }
+  }
+  const sfx = {
+    coin(v) { const f = 2600 - (DIAM[v] - 16) * 90; tone(f, 0, 0.14, 'triangle', 0.22); tone(f * 1.48, 0.015, 0.1, 'sine', 0.1); },
+    back() { tone(620, 0, 0.08, 'sine', 0.15); tone(460, 0.05, 0.09, 'sine', 0.12); },
+    nope() { tone(300, 0, 0.16, 'triangle', 0.2); tone(225, 0.14, 0.22, 'triangle', 0.2); },
+    win() { [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => tone(f, i * 0.09, 0.28, 'triangle', 0.2)); },
+    fanfare() { [523.25, 659.25, 783.99, 659.25, 783.99, 1046.5].forEach((f, i) => tone(f, i * 0.13, i === 5 ? 0.6 : 0.25, 'triangle', 0.2)); },
+    tap() { tone(900, 0, 0.05, 'sine', 0.1); }
+  };
+
+  /* ---------- reading aloud ---------- */
+  const canSpeak = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+  let voice = null;
+  function loadVoice() {
+    try {
+      const vs = window.speechSynthesis.getVoices() || [];
+      voice = vs.find(v => /^en[-_]GB/i.test(v.lang)) || vs.find(v => /^en/i.test(v.lang)) || null;
+    } catch (e) { voice = null; }
+  }
+  if (canSpeak) {
+    loadVoice();
+    try { window.speechSynthesis.addEventListener('voiceschanged', loadVoice); } catch (e) { /* older browsers */ }
+  }
+  function say(text) {
+    if (!canSpeak) return;
+    try {
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      if (voice) { u.voice = voice; u.lang = voice.lang; } else u.lang = 'en-GB';
+      u.rate = 0.9;
+      u.pitch = 1.05;
+      window.speechSynthesis.speak(u);
+    } catch (e) { /* speech not available */ }
+  }
+
+  /* ---------- drawing a coin ---------- */
+  function coinHTML(v, style) {
+    const big = v >= 100;
+    return '<span class="coin m-' + METAL[v] + '" style="--r:' + (DIAM[v] / 25.75).toFixed(3) + (style ? ';' + style : '') + '" aria-hidden="true">' +
+      (big ? '<span class="core"></span>' : '') +
+      '<span class="coin-label"><b>' + (big ? v / 100 : v) + '</b><i>' + (big ? 'euro' : 'cent') + '</i></span></span>';
+  }
+
+  /* ---------- elements ---------- */
+  const E = {
+    levels: $('#levels'), brand: $('#brandCoins'), meetTile: $('#meetTile'), learn: $('#learnBody'),
+    lvlEmoji: $('#lvlEmoji'), lvlName: $('#lvlName'), dots: $('#dots'),
+    item: $('#itemEmoji'), price: $('#price'), words: $('#priceWords'), speak: $('#speakBtn'), task: $('#task'),
+    counter: $('#counter'), slots: $('#slots'), total: $('#total'), feedback: $('#feedback'), purse: $('#purse'),
+    clear: $('#clearBtn'), hint: $('#hintBtn'), pay: $('#payBtn'), playScroll: $('#play .scroll'),
+    win: $('#win'), winEmoji: $('#winEmoji'), winTitle: $('#winTitle'), winText: $('#winText'), winCoins: $('#winCoins'), winTip: $('#winTip'), next: $('#nextBtn'),
+    doneEmoji: $('#doneEmoji'), doneTitle: $('#doneTitle'), doneStars: $('#doneStars'), doneText: $('#doneText'), nextLevel: $('#nextLevelBtn'), again: $('#againBtn'),
+    settings: $('#settings'), reset: $('#resetBtn'), closeSettings: $('#closeSettings'), voiceRow: $('#voiceRow')
+  };
+
+  /* ---------- screens ---------- */
+  let current = 'home';
+  function show(id) {
+    if (current === 'play' && id !== 'play' && canSpeak) { try { window.speechSynthesis.cancel(); } catch (e) { /* ignore */ } }
+    current = id;
+    $$('.screen').forEach(s => s.classList.toggle('active', s.id === id));
+    const sc = $('#' + id + ' .scroll');
+    if (sc) sc.scrollTop = 0;
+    if (id === 'home') renderHome();
+  }
+
+  function renderHome() {
+    E.levels.innerHTML = LEVELS.map(L => {
+      const s = stars[L.id] || 0;
+      return '<button type="button" class="level" data-level="' + L.id + '" aria-label="Level ' + L.id + ', ' + L.name + '. ' + L.desc + '. ' + s + ' of 3 stars.">' +
+        '<span class="lv-tile" aria-hidden="true">' + L.emoji + '<span class="lv-num">' + L.id + '</span></span>' +
+        '<span class="lv-text" aria-hidden="true"><span class="lv-name">' + L.name + '</span><span class="lv-desc">' + L.desc + '</span></span>' +
+        '<span class="lv-stars" aria-hidden="true">' + [1, 2, 3].map(i => '<span' + (i <= s ? ' class="on"' : '') + '>★</span>').join('') + '</span>' +
+        '</button>';
+    }).join('');
+  }
+
+  function renderLearn() {
+    const groups = [
+      ['Copper coins', '1, 2 and 5 cents are reddish-brown.', [1, 2, 5]],
+      ['Golden coins', '10, 20 and 50 cents are golden yellow.', [10, 20, 50]],
+      ['Euro coins', 'These have two metals. The 1 euro coin is silver in the middle. The 2 euro coin is gold in the middle.', [100, 200]]
+    ];
+    let html = groups.map(g =>
+      '<section class="learn-card"><h3>' + g[0] + '</h3><p>' + g[1] + '</p>' +
+      '<div class="learn-row felt">' + g[2].map(v =>
+        '<button type="button" class="learn-coin" data-v="' + v + '" aria-label="' + words(v) + '">' + coinHTML(v) + '<span class="name">' + words(v) + '</span></button>'
+      ).join('') + '</div></section>'
+    ).join('');
+    html +=
+      '<section class="learn-card"><h3>100 cents make 1 euro</h3>' +
+      '<div class="equation felt" role="img" aria-label="50 cents plus 50 cents equals 1 euro">' + coinHTML(50) + '<span>+</span>' + coinHTML(50) + '<span>=</span>' + coinHTML(100) + '</div>' +
+      '<p class="after">Look closely: the 10 cent coin is smaller than the 5 cent coin! Each euro country puts its own picture on the back of its coins, and you can spend them in any euro country.</p></section>' +
+      '<button type="button" class="btn btn-pay btn-wide" id="learnPlay">Play level 1</button>';
+    E.learn.innerHTML = html;
+  }
+
+  /* ---------- game state ---------- */
+  const S = { level: null, rounds: [], idx: 0, tray: [], uid: 0, lastAdded: 0, mistakes: 0, hinted: false, solved: false, results: [] };
+  const round = () => S.rounds[S.idx];
+  const avail = () => COINS.filter(c => !round().missing.includes(c));
+  const traySum = () => S.tray.reduce((s, c) => s + c.v, 0);
+
+  function startLevel(id) {
+    const L = LEVELS.find(l => l.id === id);
+    if (!L) { show('home'); return; }
+    S.level = L;
+    S.rounds = withItems(L.make());
+    S.idx = 0;
+    S.results = [];
+    E.lvlEmoji.textContent = L.emoji;
+    E.lvlName.textContent = L.name;
+    show('play');
+    startRound();
+  }
+
+  function startRound() {
+    S.tray = []; S.mistakes = 0; S.hinted = false; S.solved = false; S.lastAdded = 0;
+    clearGlow();
+    renderPurse();
+    renderPlayText();
+    renderSlots();
+    renderDots();
+    setFeedback(S.idx === 0 ? 'Tap the coins in your purse to pay.' : '', 'info');
+    restartAnim(E.item, 'bounce');
+    E.playScroll.scrollTop = 0;
+    if (settings.voice) say('The ' + round().item[1] + ' costs ' + words(round().target) + '.');
+  }
+
+  function renderPlayText() {
+    const r = round(), cap = S.level.cap;
+    E.item.textContent = r.item[0];
+    E.price.textContent = fmt(r.target);
+    E.words.textContent = words(r.target);
+    const limit = 'Use up to ' + cap + ' coins.';
+    if (cap === 1) E.task.textContent = 'Which coin pays for the ' + r.item[1] + '?';
+    else if (r.missing.length) E.task.textContent = 'No ' + r.missing.map(coinWord).join(' or ') + ' coins today! ' + limit;
+    else E.task.textContent = 'Pay for the ' + r.item[1] + '. ' + limit;
+  }
+
+  function renderDots() {
+    E.dots.innerHTML = S.rounds.map((_, i) => {
+      const cls = i < S.results.length ? (S.results[i] ? 'perfect' : 'ok') : i === S.idx ? 'cur' : '';
+      return '<span class="dot ' + cls + '"></span>';
+    }).join('');
+    E.dots.setAttribute('aria-label', 'Question ' + Math.min(S.idx + 1, S.rounds.length) + ' of ' + S.rounds.length);
+  }
+
+  function renderPurse() {
+    const miss = round().missing;
+    E.purse.innerHTML = COINS.map(v => {
+      const m = miss.includes(v);
+      return '<button type="button" class="coin-btn" data-v="' + v + '"' + (m ? ' disabled' : '') +
+        ' aria-label="' + (m ? 'No ' + coinWord(v) + ' coins' : 'Add ' + words(v)) + '">' + coinHTML(v) + '</button>';
+    }).join('');
+  }
+
+  function renderSlots() {
+    if (!S.level) return;
+    const cap = S.level.cap;
+    const sorted = S.tray.slice().sort((a, b) => b.v - a.v || a.id - b.id);
+    let html = '';
+    for (let i = 0; i < cap; i++) {
+      const c = sorted[i];
+      html += c
+        ? '<button type="button" class="slot filled' + (c.id === S.lastAdded ? ' pop' : '') + '" data-id="' + c.id + '" data-v="' + c.v + '" aria-label="Take back ' + words(c.v) + '">' + coinHTML(c.v) + '</button>'
+        : '<span class="slot" aria-hidden="true"></span>';
+    }
+    E.slots.innerHTML = html;
+    E.slots.dataset.cap = String(cap);
+    S.lastAdded = 0;
+    E.total.textContent = 'Total ' + fmt(traySum());
+    E.total.hidden = !settings.total;
+    E.pay.disabled = S.solved || !S.tray.length;
+    E.clear.disabled = S.solved || !S.tray.length;
+  }
+
+  function setFeedback(msg, kind) {
+    E.feedback.textContent = msg || '';
+    E.feedback.className = 'feedback' + (msg && kind ? ' ' + kind : '');
+  }
+  function restartAnim(node, cls) {
+    if (!node) return;
+    node.classList.remove(cls);
+    void node.offsetWidth;
+    node.classList.add(cls);
+  }
+  let glowTimer = 0;
+  function clearGlow() {
+    clearTimeout(glowTimer);
+    $$('.glow, .wiggle').forEach(n => n.classList.remove('glow', 'wiggle'));
+  }
+  function glow(node, cls) {
+    clearGlow();
+    if (!node) return;
+    restartAnim(node, cls || 'glow');
+    glowTimer = setTimeout(clearGlow, 3200);
+  }
+  const purseBtn = v => E.purse.querySelector('[data-v="' + v + '"]');
+
+  /* ---------- actions ---------- */
+  function addCoin(v) {
+    if (S.solved || !S.level || round().missing.includes(v)) return;
+    const cap = S.level.cap;
+    if (S.tray.length >= cap) {
+      if (cap === 1) S.tray = [];
+      else {
+        setFeedback('No more room! Tap a coin on the counter to take it back.', 'hint');
+        restartAnim(E.counter, 'shake');
+        sfx.nope();
+        return;
+      }
+    }
+    S.tray.push({ id: ++S.uid, v });
+    S.lastAdded = S.uid;
+    sfx.coin(v);
+    clearGlow();
+    setFeedback('', '');
+    renderSlots();
+  }
+
+  function removeCoin(id) {
+    if (S.solved) return;
+    S.tray = S.tray.filter(c => c.id !== id);
+    sfx.back();
+    clearGlow();
+    setFeedback('', '');
+    renderSlots();
+  }
+
+  function clearTray() {
+    if (S.solved || !S.tray.length) return;
+    S.tray = [];
+    sfx.back();
+    clearGlow();
+    setFeedback('', '');
+    renderSlots();
+  }
+
+  function pay() {
+    if (S.solved || !S.tray.length) return;
+    const diff = round().target - traySum();
+    if (diff === 0) { win(); return; }
+    S.mistakes++;
+    sfx.nope();
+    restartAnim(E.counter, 'shake');
+    const cap = S.level.cap, full = S.tray.length >= cap;
+    let msg;
+    if (cap === 1) msg = diff > 0 ? 'Not enough! Try a bigger coin.' : 'Too much! Try a smaller coin.';
+    else if (diff > 0) {
+      msg = S.mistakes === 1
+        ? (full ? 'Not enough! Try swapping a coin for a bigger one.' : 'Not enough yet! Add more coins.')
+        : 'You need ' + fmt(diff) + ' more.' + (full ? ' Swap a coin for a bigger one.' : '');
+    } else {
+      msg = S.mistakes === 1 ? 'Too much! Take a coin back.' : 'That’s ' + fmt(-diff) + ' too much. Take a coin back.';
+    }
+    setFeedback(msg, 'bad');
+  }
+
+  function hint() {
+    if (S.solved || !S.level) return;
+    const r = round(), cap = S.level.cap, av = avail();
+    const rem = r.target - traySum(), left = cap - S.tray.length;
+    S.hinted = true;
+    if (rem === 0) { setFeedback('That’s exactly right! Press Pay.', 'good'); glow(E.pay); return; }
+    if (cap === 1) { setFeedback('Look for this coin!', 'hint'); glow(purseBtn(r.target)); return; }
+    if (rem > 0) {
+      const combo = bestCombo(rem, av);
+      if (combo && combo.length <= left) {
+        setFeedback('Try a ' + coinWord(combo[0]) + ' coin!', 'hint');
+        glow(purseBtn(combo[0]));
+        return;
+      }
+    }
+    // the coins on the counter can’t be finished: find one coin to take back
+    const vals = Array.from(new Set(S.tray.map(c => c.v))).sort((a, b) => b - a);
+    for (const v of vals) {
+      const need = rem + v;
+      const combo = need >= 0 ? bestCombo(need, av) : null;
+      if (combo && combo.length <= left + 1) {
+        setFeedback('Take back the ' + coinWord(v) + ' coin.', 'hint');
+        glow(E.slots.querySelector('.slot.filled[data-v="' + v + '"]'), 'wiggle');
+        return;
+      }
+    }
+    setFeedback('Let’s start again. Press Clear.', 'hint');
+    glow(E.clear);
+  }
+
+  const PRAISE = ['Great job!', 'Well done!', 'Super!', 'You did it!', 'Brilliant!', 'Perfect!', 'Hooray!'];
+  function win() {
+    const r = round();
+    S.solved = true;
+    S.results.push(S.mistakes === 0 && !S.hinted);
+    clearGlow();
+    renderDots();
+    renderSlots();
+    setFeedback('', '');
+    sfx.win();
+    confetti(false);
+    const praise = pick(PRAISE);
+    E.winEmoji.textContent = r.item[0];
+    E.winTitle.textContent = praise;
+    E.winText.textContent = 'You bought the ' + r.item[1] + '!';
+    const used = S.tray.map(c => c.v).sort((a, b) => b - a);
+    E.winCoins.innerHTML = used.map(v => coinHTML(v)).join('<span class="op">+</span>') + '<span class="op">=</span><span class="sum">' + fmt(r.target) + '</span>';
+    E.winCoins.setAttribute('aria-label', used.map(words).join(' plus ') + ' makes ' + words(r.target));
+    E.winCoins.setAttribute('role', 'img');
+    const best = bestCombo(r.target, avail());
+    if (best && best.length < used.length) {
+      E.winTip.innerHTML = '<span>You could also pay with just ' + best.length + ' coin' + (best.length > 1 ? 's' : '') + ':</span><span class="tip-coins">' + best.map(v => coinHTML(v)).join('') + '</span>';
+      E.winTip.hidden = false;
+    } else {
+      E.winTip.hidden = true;
+    }
+    E.next.textContent = S.idx >= S.rounds.length - 1 ? 'Finish' : 'Next';
+    E.win.hidden = false;
+    setTimeout(() => { try { E.next.focus({ preventScroll: true }); } catch (e) { E.next.focus(); } }, 60);
+    if (settings.voice) say(praise + ' You bought the ' + r.item[1] + '!');
+  }
+
+  function nextRound() {
+    E.win.hidden = true;
+    if (S.idx >= S.rounds.length - 1) { finishLevel(); return; }
+    S.idx++;
+    startRound();
+  }
+
+  function finishLevel() {
+    const L = S.level, perfect = S.results.filter(Boolean).length;
+    const s = perfect >= ROUNDS ? 3 : perfect >= 3 ? 2 : 1;
+    if (!(stars[L.id] >= s)) { stars[L.id] = s; store.set('ecs.stars', stars); }
+    E.doneEmoji.textContent = s === 3 ? '🏆' : s === 2 ? '🎉' : '👏';
+    E.doneTitle.textContent = 'Level ' + L.id + ' complete!';
+    E.doneStars.innerHTML = [1, 2, 3].map(i => '<span class="star' + (i <= s ? ' on' : '') + '" style="--i:' + i + '">★</span>').join('');
+    E.doneStars.setAttribute('aria-label', s + ' of 3 stars');
+    E.doneText.textContent = perfect === ROUNDS
+      ? 'All ' + ROUNDS + ' right on the first try. Amazing!'
+      : perfect + ' of ' + ROUNDS + ' right on the first try. ' + (s === 1 ? 'Keep going, you’re learning fast!' : 'Great work!');
+    const last = L.id >= LEVELS.length;
+    E.nextLevel.hidden = last;
+    E.again.classList.toggle('btn-pay', last);
+    E.again.classList.toggle('btn-ghost', !last);
+    show('done');
+    sfx.fanfare();
+    confetti(true);
+    if (settings.voice) say('Level ' + L.id + ' complete! You got ' + s + ' star' + (s > 1 ? 's' : '') + '.');
+  }
+
+  /* ---------- confetti ---------- */
+  const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function confetti(big) {
+    if (reduceMotion) return;
+    const box = document.createElement('div');
+    box.className = 'confetti';
+    box.setAttribute('aria-hidden', 'true');
+    const colors = ['#ffd23f', '#e5484d', '#2c8572', '#ff9f1c', '#7fc1ff', '#f0a6b5', '#d27b48', '#d8dce2'];
+    let html = '';
+    const n = big ? 70 : 42;
+    for (let i = 0; i < n; i++) {
+      const x = ((Math.random() * 2 - 1) * 46).toFixed(1);
+      const y1 = (-(12 + Math.random() * 28)).toFixed(1);
+      const y2 = (30 + Math.random() * 40).toFixed(1);
+      const rot = Math.round((Math.random() * 2 - 1) * 720);
+      const w = 6 + rand(7), h = 8 + rand(9);
+      html += '<i style="--x:' + x + 'vw;--y1:' + y1 + 'vh;--y2:' + y2 + 'vh;--rot:' + rot + 'deg;--c:' + pick(colors) +
+        ';width:' + w + 'px;height:' + h + 'px;animation-delay:' + rand(120) + 'ms"></i>';
+    }
+    box.innerHTML = html;
+    document.body.appendChild(box);
+    setTimeout(() => box.remove(), 1900);
+  }
+
+  /* ---------- settings ---------- */
+  let lastFocus = null, resetArmed = false, resetTimer = 0;
+  function syncSettingsUI() {
+    $$('.switch', E.settings).forEach(b => b.setAttribute('aria-checked', settings[b.dataset.key] ? 'true' : 'false'));
+    $$('[data-fmt]', E.settings).forEach(b => b.setAttribute('aria-pressed', settings.fmt === b.dataset.fmt ? 'true' : 'false'));
+    E.voiceRow.hidden = !canSpeak;
+  }
+  function openSettings() {
+    lastFocus = document.activeElement;
+    syncSettingsUI();
+    E.settings.hidden = false;
+    E.closeSettings.focus();
+  }
+  function closeSettings() {
+    E.settings.hidden = true;
+    resetArmed = false;
+    E.reset.textContent = 'Reset stars';
+    if (current === 'play' && S.level) { renderPlayText(); renderSlots(); }
+    if (current === 'home') renderHome();
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+  E.settings.addEventListener('click', e => {
+    if (e.target === E.settings) { closeSettings(); return; }
+    const sw = e.target.closest('.switch');
+    if (sw) {
+      const k = sw.dataset.key;
+      settings[k] = !settings[k];
+      saveSettings();
+      syncSettingsUI();
+      if (k === 'sound' && settings.sound) sfx.tap();
+      if (k === 'voice' && settings.voice) say('I will read each price out loud.');
+      return;
+    }
+    const f = e.target.closest('[data-fmt]');
+    if (f) { settings.fmt = f.dataset.fmt; saveSettings(); syncSettingsUI(); }
+  });
+  E.reset.addEventListener('click', () => {
+    if (!resetArmed) {
+      resetArmed = true;
+      E.reset.textContent = 'Tap again to reset';
+      clearTimeout(resetTimer);
+      resetTimer = setTimeout(() => { resetArmed = false; E.reset.textContent = 'Reset stars'; }, 3000);
+      return;
+    }
+    resetArmed = false;
+    stars = {};
+    store.set('ecs.stars', stars);
+    E.reset.textContent = 'Stars reset';
+  });
+  E.closeSettings.addEventListener('click', closeSettings);
+
+  /* ---------- wiring ---------- */
+  document.addEventListener('click', e => {
+    const go = e.target.closest('[data-go]');
+    if (go) { sfx.tap(); show(go.dataset.go); return; }
+    if (e.target.closest('[data-settings]')) openSettings();
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && !E.settings.hidden) closeSettings();
+  });
+  E.levels.addEventListener('click', e => {
+    const b = e.target.closest('[data-level]');
+    if (b) { sfx.tap(); startLevel(Number(b.dataset.level)); }
+  });
+  $('#meetBtn').addEventListener('click', () => { sfx.tap(); show('learn'); });
+  E.learn.addEventListener('click', e => {
+    const c = e.target.closest('.learn-coin');
+    if (c) {
+      const v = Number(c.dataset.v);
+      sfx.coin(v);
+      say(words(v));
+      restartAnim(c, 'spin');
+      return;
+    }
+    if (e.target.closest('#learnPlay')) startLevel(1);
+  });
+  E.purse.addEventListener('click', e => {
+    const b = e.target.closest('.coin-btn');
+    if (b && !b.disabled) addCoin(Number(b.dataset.v));
+  });
+  E.slots.addEventListener('click', e => {
+    const b = e.target.closest('.slot.filled');
+    if (b) removeCoin(Number(b.dataset.id));
+  });
+  E.clear.addEventListener('click', clearTray);
+  E.hint.addEventListener('click', hint);
+  E.pay.addEventListener('click', pay);
+  E.next.addEventListener('click', nextRound);
+  E.speak.addEventListener('click', () => { const r = round(); if (r) say('The ' + r.item[1] + ' costs ' + words(r.target) + '.'); });
+  E.nextLevel.addEventListener('click', () => startLevel(S.level.id + 1));
+  E.again.addEventListener('click', () => startLevel(S.level.id));
+
+  /* ---------- start ---------- */
+  E.brand.innerHTML = COINS.map((v, i) => coinHTML(v, '--rot:' + ((i % 2 ? 1 : -1) * (4 + i * 1.5)) + 'deg')).join('');
+  E.meetTile.innerHTML = [1, 50, 200].map(v => coinHTML(v)).join('');
+  if (!canSpeak) E.speak.hidden = true;
+  renderHome();
+  renderLearn();
+
+})();
+</script>
+</body>
+</html>
